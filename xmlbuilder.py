@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from StringIO import StringIO
-from exceptions import UnicodeDecodeError
+from xml.sax import saxutils
+from keyword import kwlist as PYTHON_KWORD_LIST
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
@@ -29,17 +30,6 @@ class builder:
 
 class element:
   _dummy = {}
-  # todo: figure out if we can get this from some built-in python lib
-  TEXT_ESCAPE = ( # special characters in text
-    ('&', '&amp;'),
-    ('<', '&lt;'),
-    ('>', '&gt;'),
-  )
-  ATTR_ESCAPE = TEXT_ESCAPE + ( # special characters in attribute values
-    ('"', '&quot;'),
-    ("'", '&apos;'),
-  )
-  from keyword import kwlist as PYTHON_KWORD_LIST
   PYTHON_KWORD_MAP = dict([(k + '_', k) for k in PYTHON_KWORD_LIST])
   def __init__(self, name, builder):
     self.name = self.nameprep(name)
@@ -58,25 +48,20 @@ class element:
     if _value is None:
       self.builder._write('<%s%s />' % (self.name, self.serialized_attrs))
     elif _value != element._dummy:
-      self.builder._write('<%s%s>%s</%s>' % (self.name, self.serialized_attrs, self.escape(_value), self.name))
+      self.builder._write('<%s%s>%s</%s>' % (self.name, self.serialized_attrs, saxutils.escape(_value), self.name))
       return
     return self
   def serialize_attrs(self, attrs):
     serialized = []
     for attr, value in attrs.items():
-      serialized.append(' %s="%s"' % (self.nameprep(attr), self.escape(value, element.ATTR_ESCAPE)))
+      serialized.append(' %s=%s' % (self.nameprep(attr), saxutils.quoteattr(value)))
     return ''.join(serialized)
-  def escape(self, s, escapes=TEXT_ESCAPE):
-    """Escape special characters in s."""
-    for orig, esc in escapes:
-      s = s.replace(orig, esc)
-      return s
   def nameprep(self, name):
     """Undo keyword and colon mangling"""
     name = element.PYTHON_KWORD_MAP.get(name, name)
     return name.replace('__', ':')
   def text(self, value):
-    self.builder._write(self.escape(value))
+    self.builder._write(saxutils.escape(value))
 
 if __name__ == "__main__":
   xml = builder(version="1.0", encoding="utf-8")
