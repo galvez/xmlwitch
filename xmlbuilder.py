@@ -51,13 +51,13 @@ class element:
   def __exit__(self, type, value, tb):
     self.builder.indentation -= 1
     self.builder.write('</%s>\n' % self.name)
-  def __call__(self, value=_dummy, **kargs):
+  def __call__(self, _value=_dummy, **kargs):
     if kargs:
       self.serialized_attrs = self.serialize_attrs(kargs)
-    if value == None:
+    if _value is None:
       self.builder.write('<%s%s />\n' % (self.name, self.serialized_attrs))
-    elif value != element._dummy:
-      self.builder.write('<%s%s>%s</%s>\n' % (self.name, self.serialized_attrs, self.escape(value), self.name))
+    elif _value != element._dummy:
+      self.builder.write('<%s%s>%s</%s>\n' % (self.name, self.serialized_attrs, self.escape(_value), self.name))
       return
     return self
   def serialize_attrs(self, attrs):
@@ -96,4 +96,5 @@ if __name__ == "__main__":
       with xml.content(type='xhtml'):
         with xml.div(xmlns='http://www.w3.org/1999/xhtml'):
           xml.label('Some label', for_='some_field')
+          xml.input(None, type='text', value='')
   print xml
