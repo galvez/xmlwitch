@@ -48,6 +48,7 @@ class element:
   def __enter__(self):
     self.builder.write('<%s%s>\n' % (self.name, self.serialized_attrs))
     self.builder.indentation += 1
+    return self
   def __exit__(self, type, value, tb):
     self.builder.indentation -= 1
     self.builder.write('</%s>\n' % self.name)
@@ -74,7 +75,8 @@ class element:
     """Undo keyword and colon mangling"""
     name = element.PYTHON_KWORD_MAP.get(name, name)
     return name.replace('__', ':')
-
+  def text(self, value):
+    self.builder.write(self.escape(value) + '\n')
 if __name__ == "__main__":
   xml = builder(version="1.0", encoding="utf-8")
   with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
@@ -94,7 +96,8 @@ if __name__ == "__main__":
       xml.updated('2003-12-13T18:30:02Z')
       xml.summary('Some text.')
       with xml.content(type='xhtml'):
-        with xml.div(xmlns='http://www.w3.org/1999/xhtml'):
+        with xml.div(xmlns='http://www.w3.org/1999/xhtml') as div:
           xml.label('Some label', for_='some_field')
+          div.text(':')
           xml.input(None, type='text', value='')
   print xml
