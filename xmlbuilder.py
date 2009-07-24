@@ -39,8 +39,10 @@ class element:
     ('"', '&quot;'),
     ("'", '&apos;'),
   )
+  from keyword import kwlist as PYTHON_KWORD_LIST
+  PYTHON_KWORD_MAP = dict([(k + '_', k) for k in PYTHON_KWORD_LIST])
   def __init__(self, name, builder):
-    self.name = nameprep(name)
+    self.name = self.nameprep(name)
     self.builder = builder
     self.serialized_attrs = ''
   def __enter__(self):
@@ -61,13 +63,17 @@ class element:
   def serialize_attrs(self, attrs):
     serialized = []
     for attr, value in attrs.items():
-      serialized.append(' %s="%s"' % (nameprep(attr), self.escape(value, element.ATTR_ESCAPE)))
+      serialized.append(' %s="%s"' % (self.nameprep(attr), self.escape(value, element.ATTR_ESCAPE)))
     return ''.join(serialized)
   def escape(self, s, escapes=TEXT_ESCAPE):
     """Escape special characters in s."""
     for orig, esc in escapes:
       s = s.replace(orig, esc)
       return s
+  def nameprep(self, name):
+    """Undo keyword and colon mangling"""
+    name = element.PYTHON_KWORD_MAP.get(name, name)
+    return name.replace('__', ':')
 
 if __name__ == "__main__":
   xml = builder(version="1.0", encoding="utf-8")
@@ -79,6 +85,7 @@ if __name__ == "__main__":
       xml.name('John Doe')
     xml.id('urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6')
     with xml.entry:
+      xml['my:elem']("Hello these are namespaces!", **{'xmlns:my':'http://example.org/ns/', 'my:attr':'what?'})
       xml.my__elem("Hello these are namespaces!", xmlns__my='http://example.org/ns/', my__attr='what?')
       xml.quoting("< > & ' \"", attr="< > & ' \"")
       xml.title('Atom-Powered Robots Run Amok')
@@ -86,4 +93,7 @@ if __name__ == "__main__":
       xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
       xml.updated('2003-12-13T18:30:02Z')
       xml.summary('Some text.')
+      with xml.content(type='xhtml'):
+        with xml.div(xmlns='http://www.w3.org/1999/xhtml'):
+          xml.label('Some label', for_='some_field')
   print xml
