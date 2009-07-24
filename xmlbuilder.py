@@ -35,38 +35,40 @@ class element:
   def __init__(self, name, builder):
     self.name = name
     self.builder = builder
+    self.attributes = {}
   def __enter__(self):
     self.builder.indentation += 2
-    if hasattr(self, 'attributes'):
-      self.builder.write('<%s %s>\n' % (self.name, self.serialized_attrs))
+    if self.attributes:
+      self.builder.write('<%s %s>\n' % (self.name, self.serialized_attributes))
     else:
       self.builder.write('<%s>\n' % self.name)
   def __exit__(self, type, value, tb):
     self.builder.write('</%s>\n' % self.name)
     self.builder.indentation -= 2
-  def __call__(self, value=_dummy, **kargs):
-    if len(kargs.keys()) > 0:
-      self.attributes = kargs
-      self.serialized_attrs = self.serialize_attrs(kargs)
+  def __call__(self, value=_dummy, **kwargs):
+    self.attributes.update(kwargs)
+
     if value == None:
       self.builder.indentation += 2
-      if hasattr(self, 'attributes'):
-        self.builder.write('<%s %s />\n' % (self.name, self.serialized_attrs))
+      if self.attributes:
+        self.builder.write('<%s %s />\n' % (self.name, self.serialized_attributes))
       else:
         self.builder.write('<%s />\n' % self.name)
       self.builder.indentation -= 2
     elif value != _dummy:
       self.builder.indentation += 2
-      if hasattr(self, 'attributes'):
-        self.builder.write('<%s %s>%s</%s>\n' % (self.name, self.serialized_attrs, value, self.name))
+      if self.attributes:
+        self.builder.write('<%s %s>%s</%s>\n' % (self.name, self.serialized_attributes, value, self.name))
       else:
         self.builder.write('<%s>%s</%s>\n' % (self.name, value, self.name))
       self.builder.indentation -= 2
       return
     return self
-  def serialize_attrs(self, attrs):
+
+  @property
+  def serialized_attributes(self):
     serialized = []
-    for attr, value in attrs.items():
+    for attr, value in self.attributes.items():
       serialized.append('%s="%s"' % (attr, value))
     return ' '.join(serialized)
 
