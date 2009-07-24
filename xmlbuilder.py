@@ -6,7 +6,6 @@ __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
 __license__ = "GPL"
 
-import sys
 
 class builder:
   def __init__(self, version, encoding):
@@ -23,7 +22,7 @@ class builder:
       return self.document.getvalue().encode('utf-8')
     return self.document.getvalue()
   def __unicode__(self):
-    return self.document.getvalue().decode("utf-8")
+    return self.document.getvalue().decode('utf-8')
   def write(self, line):
     if self.unicode:
       line = line.decode('utf-8')
