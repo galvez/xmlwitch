@@ -13,6 +13,7 @@ class builder:
     self.document.write('<?xml version="%s" encoding="%s"?>\n' % (version, encoding))
     self.unicode = (encoding == 'utf-8')
     self.indentation = 0
+    self.indent = '  '
   def __getattr__(self, name):
     return element(name, self)
   __getitem__ = __getattr__
@@ -25,7 +26,7 @@ class builder:
   def write(self, line):
     if self.unicode:
       line = line.decode('utf-8')
-    self.document.write('%s%s' % ((self.indentation * ' '), line))
+    self.document.write('%s%s' % ((self.indentation * self.indent), line))
 
 _dummy = {}
 
@@ -36,9 +37,9 @@ class element:
     self.serialized_attrs = ''
   def __enter__(self):
     self.builder.write('<%s%s>\n' % (self.name, self.serialized_attrs))
-    self.builder.indentation += 2
+    self.builder.indentation += 1
   def __exit__(self, type, value, tb):
-    self.builder.indentation -= 2
+    self.builder.indentation -= 1
     self.builder.write('</%s>\n' % self.name)
   def __call__(self, value=_dummy, **kargs):
     if kargs:
