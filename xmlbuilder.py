@@ -6,6 +6,21 @@ __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
 __license__ = "GPL"
 
+text_escape = (                 # special characters in text
+  ('&', '&amp;'),
+  ('<', '&lt;'),
+  ('>', '&gt;'),
+)
+attr_escape = text_escape + (   # special characters in attribute values
+  ('"', '&quot;'),
+  ("'", '&apos;'),
+)
+
+def escape(s, escapes=text_escape):
+    """Escape special characters in s."""
+    for orig, esc in escapes:
+        s = s.replace(orig, esc)
+    return s
 
 class builder:
   def __init__(self, version, encoding):
@@ -47,13 +62,13 @@ class element:
     if value == None:
       self.builder.write('<%s%s />\n' % (self.name, self.serialized_attrs))
     elif value != _dummy:
-      self.builder.write('<%s%s>%s</%s>\n' % (self.name, self.serialized_attrs, value, self.name))
+      self.builder.write('<%s%s>%s</%s>\n' % (self.name, self.serialized_attrs, escape(value), self.name))
       return
     return self
   def serialize_attrs(self, attrs):
     serialized = []
     for attr, value in attrs.items():
-      serialized.append(' %s="%s"' % (attr, value))
+      serialized.append(' %s="%s"' % (attr, escape(value, attr_escape)))
     return ''.join(serialized)
 
 if __name__ == "__main__":
@@ -67,6 +82,7 @@ if __name__ == "__main__":
     xml.id('urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6')
     with xml.entry:
       xml["my:namespace"]("Hello these are namespaces!")
+      xml.quoting("< > & ' \"", attr="< > & ' \"")
       xml.title('Atom-Powered Robots Run Amok')
       xml.link(None, href='http://example.org/2003/12/13/atom03')
       xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
