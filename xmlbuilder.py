@@ -12,7 +12,7 @@ class builder:
     self.document = StringIO()
     self.document.write('<?xml version="%s" encoding="%s"?>\n' % (version, encoding))
     self.unicode = (encoding == 'utf-8')
-    self.indentation = -2
+    self.indentation = 0
   def __getattr__(self, name):
     return element(name, self)
   __getitem__ = __getattr__
@@ -35,22 +35,18 @@ class element:
     self.builder = builder
     self.serialized_attrs = ''
   def __enter__(self):
-    self.builder.indentation += 2
     self.builder.write('<%s%s>\n' % (self.name, self.serialized_attrs))
+    self.builder.indentation += 2
   def __exit__(self, type, value, tb):
-    self.builder.write('</%s>\n' % self.name)
     self.builder.indentation -= 2
+    self.builder.write('</%s>\n' % self.name)
   def __call__(self, value=_dummy, **kargs):
     if kargs:
       self.serialized_attrs = self.serialize_attrs(kargs)
     if value == None:
-      self.builder.indentation += 2
       self.builder.write('<%s%s />\n' % (self.name, self.serialized_attrs))
-      self.builder.indentation -= 2
     elif value != _dummy:
-      self.builder.indentation += 2
       self.builder.write('<%s%s>%s</%s>\n' % (self.name, self.serialized_attrs, value, self.name))
-      self.builder.indentation -= 2
       return
     return self
   def serialize_attrs(self, attrs):
