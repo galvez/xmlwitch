@@ -4,11 +4,10 @@ from xml.sax import saxutils
 from keyword import kwlist as PYTHON_KWORD_LIST
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
+__license__ = 'GPL'
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
-__contributors__ = [('Beat Bolli', 'http://drbeat.li/'),]
-
-
-__license__ = "GPL"
+__contributors__ = [('Beat Bolli', 'http://drbeat.li/'), # bbolli, maskliin, change this as you like
+                    ('masklinn', 'http://github.com/masklinn')]
 
 class builder:
   def __init__(self, version, encoding):
@@ -37,7 +36,7 @@ class element:
   def __init__(self, name, builder):
     self.name = self.nameprep(name)
     self.builder = builder
-    self.serialized_attrs = ''
+    self.attributes = {}
   def __enter__(self):
     self.builder._write('<%s%s>' % (self.name, self.serialized_attrs))
     self.builder._indentation += 1
@@ -46,17 +45,17 @@ class element:
     self.builder._indentation -= 1
     self.builder._write('</%s>' % self.name)
   def __call__(self, _value=_dummy, **kargs):
-    if kargs:
-      self.serialized_attrs = self.serialize_attrs(kargs)
+    self.attributes.update(kargs)
     if _value is None:
       self.builder._write('<%s%s />' % (self.name, self.serialized_attrs))
     elif _value != element._dummy:
       self.builder._write('<%s%s>%s</%s>' % (self.name, self.serialized_attrs, saxutils.escape(_value), self.name))
       return
     return self
-  def serialize_attrs(self, attrs):
+  @property
+  def serialized_attrs(self):
     serialized = []
-    for attr, value in attrs.items():
+    for attr, value in self.attributes.items():
       serialized.append(' %s=%s' % (self.nameprep(attr), saxutils.quoteattr(value)))
     return ''.join(serialized)
   def nameprep(self, name):
