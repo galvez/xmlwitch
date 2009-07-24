@@ -22,7 +22,7 @@ class builder:
     return self.document.getvalue()
   def __unicode__(self):
     return self.document.getvalue().decode('utf-8')
-  def write(self, line):
+  def _write(self, line):
     if self.unicode:
       line = line.decode('utf-8')
     self.document.write('%s%s\n' % (self.indentation * self.indent, line))
@@ -46,19 +46,19 @@ class element:
     self.builder = builder
     self.serialized_attrs = ''
   def __enter__(self):
-    self.builder.write('<%s%s>' % (self.name, self.serialized_attrs))
+    self.builder._write('<%s%s>' % (self.name, self.serialized_attrs))
     self.builder.indentation += 1
     return self
   def __exit__(self, type, value, tb):
     self.builder.indentation -= 1
-    self.builder.write('</%s>' % self.name)
+    self.builder._write('</%s>' % self.name)
   def __call__(self, _value=_dummy, **kargs):
     if kargs:
       self.serialized_attrs = self.serialize_attrs(kargs)
     if _value is None:
-      self.builder.write('<%s%s />' % (self.name, self.serialized_attrs))
+      self.builder._write('<%s%s />' % (self.name, self.serialized_attrs))
     elif _value != element._dummy:
-      self.builder.write('<%s%s>%s</%s>' % (self.name, self.serialized_attrs, self.escape(_value), self.name))
+      self.builder._write('<%s%s>%s</%s>' % (self.name, self.serialized_attrs, self.escape(_value), self.name))
       return
     return self
   def serialize_attrs(self, attrs):
@@ -76,7 +76,7 @@ class element:
     name = element.PYTHON_KWORD_MAP.get(name, name)
     return name.replace('__', ':')
   def text(self, value):
-    self.builder.write(self.escape(value))
+    self.builder._write(self.escape(value))
 
 if __name__ == "__main__":
   xml = builder(version="1.0", encoding="utf-8")
