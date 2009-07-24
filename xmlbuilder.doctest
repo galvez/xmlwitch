@@ -1,0 +1,74 @@
+XMLBuilder is a reimplementation of Ruby's Builder (http://builder.rubyforge.org/).
+
+It's goal is to allow the easy and litteral generation of XML data and
+documents using pure Python code.
+
+XMLBuilder leverages the WITH statement (and context processors), it therefore
+requires Python 2.5 or more recent.
+
+    >>> from xmlbuilder import builder
+
+Sanity check, build a very simple doc
+    >>> xml = builder(version="1.0", encoding="utf-8")
+    >>> with xml.person:
+    ...     xml.name("Bob")
+    ...     xml.city("Qusqu")
+    >>> print xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <person>
+      <name>Bob</name>
+      <city>Qusqu</city>
+    </person>
+    <BLANKLINE>
+
+Test attribute checking
+    >>> xml = builder(version="1.0", encoding="utf-8")
+    >>> e = xml.person(name="Bob", city="Qusqu")
+    >>> print xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <person name="Bob" city="Qusqu" />
+    <BLANKLINE>
+
+Deeper document nesting
+    >>> xml = builder(version="1.0", encoding="utf-8")
+    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
+    ...     xml.title('Example Feed')
+    ...     xml.updated('2003-12-13T18:30:02Z')
+    ...     with xml.author:
+    ...         xml.name('John Doe')
+    ...     xml.id('urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6')
+    ...     with xml.entry:
+    ...         xml.title('Atom-Powered Robots Run Amok')
+    ...         xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
+    ...         xml.updated('2003-12-13T18:30:02Z')
+    ...         xml.summary('Some text.')
+    >>> print xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <title>Example Feed</title>
+      <updated>2003-12-13T18:30:02Z</updated>
+      <author>
+        <name>John Doe</name>
+      </author>
+      <id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>
+      <entry>
+        <title>Atom-Powered Robots Run Amok</title>
+        <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+        <updated>2003-12-13T18:30:02Z</updated>
+        <summary>Some text.</summary>
+      </entry>
+    </feed>
+    <BLANKLINE>
+
+Content should be escaped on output
+    >>> xml = builder(version="1.0", encoding="utf-8")
+    >>> with xml.doc:
+    ...     xml.item('Text&to<escape',
+    ...              some_attr='attribute&value>to<escape')
+    >>> print xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <doc>
+      <item some_attr="attribute&amp;value&gt;to&lt;escape">Text&amp;to&lt;escape</item>
+    </doc>
+    <BLANKLINE>
+    
