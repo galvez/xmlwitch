@@ -15,8 +15,7 @@ class builder:
     self.indentation = -2
   def __getattr__(self, name):
     return element(name, self)
-  def __getitem__(self, name):
-    return element(name, self)
+  __getitem__ = __getattr__
   def __str__(self):
     if self.unicode:
       return self.document.getvalue().encode('utf-8')
