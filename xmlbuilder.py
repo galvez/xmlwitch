@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from StringIO import StringIO
 from exceptions import UnicodeDecodeError
+from xml.sax.saxutils import escape
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
@@ -58,9 +59,9 @@ class element:
     elif value != _dummy:
       self.builder.indentation += 2
       if self.attributes:
-        self.builder.write('<%s %s>%s</%s>\n' % (self.name, self.serialized_attributes, value, self.name))
+        self.builder.write('<%s %s>%s</%s>\n' % (self.name, self.serialized_attributes, escape(value), self.name))
       else:
-        self.builder.write('<%s>%s</%s>\n' % (self.name, value, self.name))
+        self.builder.write('<%s>%s</%s>\n' % (self.name, escape(value), self.name))
       self.builder.indentation -= 2
       return
     return self
@@ -69,7 +70,7 @@ class element:
   def serialized_attributes(self):
     serialized = []
     for attr, value in self.attributes.items():
-      serialized.append('%s="%s"' % (attr, value))
+      serialized.append('%s="%s"' % (attr, escape(value)))
     return ' '.join(serialized)
 
 if __name__ == "__main__":
