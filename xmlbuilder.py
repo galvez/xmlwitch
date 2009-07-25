@@ -1,14 +1,19 @@
 from __future__ import with_statement
-from StringIO import StringIO
 from exceptions import UnicodeDecodeError
-from xml.sax.saxutils import escape
+
+from StringIO import StringIO
+try:
+  from cStringIO import StringIO
+except ImportError: pass
+
 from xml.etree.ElementTree import ElementTree, Element, QName, tostring
+try:
+  from xml.etree.cElementTree import ElementTree, Element, QName, tostring
+except ImportError: pass
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
 __license__ = "GPL"
-
-import sys
 
 # Because the elementtree included in Python doesn't have a pretty printer
 def indent(elem, level=0):
