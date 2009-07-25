@@ -9,24 +9,24 @@ __license__ = "GPL"
 
 class builder:
   def __init__(self, version, encoding):
-    self.document = StringIO()
-    self.document.write('<?xml version="%s" encoding="%s"?>\n' % (version, encoding))
-    self.unicode = (encoding == 'utf-8')
-    self.indentation = 0
-    self.indent = '  '
+    self._document = StringIO()
+    self._document.write('<?xml version="%s" encoding="%s"?>\n' % (version, encoding))
+    self._unicode = (encoding == 'utf-8')
+    self._indentation = 0
+    self._indent = '  '
   def __getattr__(self, name):
     return element(name, self)
   __getitem__ = __getattr__
   def __str__(self):
-    if self.unicode:
-      return self.document.getvalue().encode('utf-8')
-    return self.document.getvalue()
+    if self._unicode:
+      return self._document.getvalue().encode('utf-8')
+    return self._document.getvalue()
   def __unicode__(self):
-    return self.document.getvalue().decode('utf-8')
+    return self._document.getvalue().decode('utf-8')
   def _write(self, line):
-    if self.unicode:
+    if self._unicode:
       line = line.decode('utf-8')
-    self.document.write('%s%s\n' % (self.indentation * self.indent, line))
+    self._document.write('%s%s\n' % (self._indentation * self._indent, line))
 
 class element:
   _dummy = {}
@@ -37,10 +37,10 @@ class element:
     self.serialized_attrs = ''
   def __enter__(self):
     self.builder._write('<%s%s>' % (self.name, self.serialized_attrs))
-    self.builder.indentation += 1
+    self.builder._indentation += 1
     return self
   def __exit__(self, type, value, tb):
-    self.builder.indentation -= 1
+    self.builder._indentation -= 1
     self.builder._write('</%s>' % self.name)
   def __call__(self, _value=_dummy, **kargs):
     if kargs:
