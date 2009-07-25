@@ -16,15 +16,15 @@ __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.b
 __license__ = "GPL"
 
 # Because the elementtree included in Python doesn't have a pretty printer
-def indent(elem, level=0):
-    i = "\n" + level*"  "
+def indent(elem, indentation=2, level=0):
+    i = "\n" + level*indentation*" "
     if len(elem):
         if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
+            elem.text = i + indentation*" "
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for elem in elem:
-            indent(elem, level+1)
+            indent(elem, indentation, level+1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
@@ -51,11 +51,13 @@ class builder:
   def __getitem__(self, name):
     return element(name, self)
 
-  def __str__(self):
+  def tostring(self, indentation=2):
     output = StringIO()
-    indent(self._tree.getroot())
+    indent(self._tree.getroot(), indentation)
     self._tree.write(output, self._encoding)
     return output.getvalue()
+  def __str__(self):
+    return self.tostring()
   def __unicode__(self):
     return str(self).decode(self._encoding)
 
