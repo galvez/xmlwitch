@@ -48,7 +48,7 @@ class builder:
     self._tree.write(output, self._encoding)
     return output.getvalue()
   def __unicode__(self):
-    return str(self).decode("utf-8")
+    return str(self).decode(self._encoding)
 
   def _send(self, element):
     """ Receive a new element to add to the current context
