@@ -1,15 +1,15 @@
 from __future__ import with_statement
 from exceptions import UnicodeDecodeError
 
-from StringIO import StringIO
 try:
   from cStringIO import StringIO
-except ImportError: pass
+except ImportError:
+  from StringIO import StringIO
 
-from xml.etree.ElementTree import ElementTree, Element, QName, tostring
 try:
   from xml.etree.cElementTree import ElementTree, Element, QName, tostring
-except ImportError: pass
+except ImportError:
+  from xml.etree.ElementTree import ElementTree, Element, QName, tostring
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
