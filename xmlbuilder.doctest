@@ -9,12 +9,12 @@ requires Python 2.5 or more recent.
     >>> from xmlbuilder import builder
 
 Sanity check, build a very simple doc
-    >>> xml = builder(version="1.0", encoding="utf-8")
-    >>> with xml.person:
+    >>> xml = builder()
+    >>> with xml.person:#doctest:+ELLIPSIS
     ...     xml.name("Bob")
     ...     xml.city("Qusqu")
+    <...
     >>> print xml
-    <?xml version="1.0" encoding="utf-8"?>
     <person>
       <name>Bob</name>
       <city>Qusqu</city>
@@ -22,16 +22,15 @@ Sanity check, build a very simple doc
     <BLANKLINE>
 
 Test attribute checking
-    >>> xml = builder(version="1.0", encoding="utf-8")
-    >>> e = xml.person(name="Bob", city="Qusqu")
+    >>> xml = builder()
+    >>> xml.person(name="Bob", city="Qusqu")#doctest:+ELLIPSIS
+    <...
     >>> print xml
-    <?xml version="1.0" encoding="utf-8"?>
-    <person name="Bob" city="Qusqu" />
-    <BLANKLINE>
+    <person city="Qusqu" name="Bob" />
 
 Deeper document nesting
-    >>> xml = builder(version="1.0", encoding="utf-8")
-    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
+    >>> xml = builder()
+    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):#doctest:+ELLIPSIS
     ...     xml.title('Example Feed')
     ...     xml.updated('2003-12-13T18:30:02Z')
     ...     with xml.author:
@@ -42,8 +41,8 @@ Deeper document nesting
     ...         xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
     ...         xml.updated('2003-12-13T18:30:02Z')
     ...         xml.summary('Some text.')
+    <...
     >>> print xml
-    <?xml version="1.0" encoding="utf-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom">
       <title>Example Feed</title>
       <updated>2003-12-13T18:30:02Z</updated>
@@ -61,12 +60,12 @@ Deeper document nesting
     <BLANKLINE>
 
 Content should be escaped on output
-    >>> xml = builder(version="1.0", encoding="utf-8")
-    >>> with xml.doc:
+    >>> xml = builder()
+    >>> with xml.doc:#doctest:+ELLIPSIS
     ...     xml.item('Text&to<escape',
     ...              some_attr='attribute&value>to<escape')
+    <...
     >>> print xml
-    <?xml version="1.0" encoding="utf-8"?>
     <doc>
       <item some_attr="attribute&amp;value&gt;to&lt;escape">Text&amp;to&lt;escape</item>
     </doc>
