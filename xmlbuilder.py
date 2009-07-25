@@ -31,6 +31,15 @@ def indent(elem, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
+def normalize(name):
+  """ Normalize a builder qname to ensure that it can be used by ElementTree:
+  * If it's a tuple, build a QName object from it
+  * Otherwise, pass it through (ET will handle names and clark's notation names)
+  """
+  if type(name) == tuple:
+    return QName(*name)
+  return name
+
 class builder:
   def __init__(self, encoding='utf-8', version='1.0'):
     self._tree = None
@@ -80,9 +89,7 @@ _dummy = {}
 
 class element:
   def __init__(self, name, builder):
-    if type(name) == tuple:
-      name = QName(*name)
-    self._node = Element(name)
+    self._node = Element(normalize(name))
 
     self.builder = builder
     self.builder._send(self)
@@ -100,13 +107,9 @@ class element:
     return self
 
   def __setitem__(self, attribute, value):
-    if type(attribute) == tuple:
-      attribute = QName(*attribute)
-    self._node.set(attribute, value)
+    self._node.set(normalize(attribute), value)
   def __getitem__(self, attribute):
-    if type(attribute) == tuple:
-      attribute = QName(*attribute)
-    return self._node.get(attribute)
+    return self._node.get(normalize(attribute))
 
   def __repr__(self):
     return repr(self._node)
