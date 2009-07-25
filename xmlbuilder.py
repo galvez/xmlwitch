@@ -81,14 +81,15 @@ _dummy = {}
 class element:
   def __init__(self, name, builder):
     if type(name) == tuple:
-      self._node = Element(QName(*name))
-    else:
-      self._node = Element(name)
+      name = QName(*name)
+    self._node = Element(name)
+
     self.builder = builder
     self.builder._send(self)
 
   def __enter__(self):
     self.builder._push(self)
+    return self
   def __exit__(self, type, value, tb):
     self.builder._pop(self)
 
