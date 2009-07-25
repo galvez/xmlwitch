@@ -70,4 +70,24 @@ Content should be escaped on output
       <item some_attr="attribute&amp;value&gt;to&lt;escape">Text&amp;to&lt;escape</item>
     </doc>
     <BLANKLINE>
-    
+
+Use dict access on the builder & Clark's notation for namespaces
+    >>> xml = builder()
+    >>> with xml.doc:#doctest:+ELLIPSIS
+    ...     xml['{http://example.com}item']('stuff here', some_attr='')
+    <...
+    >>> print xml
+    <doc>
+      <ns0:item some_attr="" xmlns:ns0="http://example.com">stuff here</ns0:item>
+    </doc>
+    <BLANKLINE>
+    >>> xml = builder()
+    >>> with xml['{http://example.com}doc']:#doctest:+ELLIPSIS
+    ...     xml['{http://example.com}item']('stuff here')
+    <...
+    >>> print xml
+    <ns0:doc xmlns:ns0="http://example.com">
+      <ns0:item>stuff here</ns0:item>
+    </ns0:doc>
+    <BLANKLINE>
+
