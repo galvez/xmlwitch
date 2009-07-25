@@ -1,0 +1,179 @@
+XMLBuilder is a reimplementation of Ruby's Builder (http://builder.rubyforge.org/).
+
+It's goal is to allow the easy and litteral generation of XML data and
+documents using pure Python code.
+
+XMLBuilder leverages the WITH statement (and context processors), it therefore
+requires Python 2.5 or more recent.
+
+    >>> from xmlbuilder import builder
+
+Sanity check, build a very simple doc
+    >>> xml = builder()
+    >>> with xml.person:#doctest:+ELLIPSIS
+    ...     xml.name("Bob")
+    ...     xml.city("Qusqu")
+    <...
+    >>> print xml
+    <person>
+      <name>Bob</name>
+      <city>Qusqu</city>
+    </person>
+    <BLANKLINE>
+
+Test attribute checking
+    >>> xml = builder()
+    >>> xml.person(name="Bob", city="Qusqu")#doctest:+ELLIPSIS
+    <...
+    >>> print xml
+    <person city="Qusqu" name="Bob" />
+
+Deeper document nesting
+    >>> xml = builder()
+    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):#doctest:+ELLIPSIS
+    ...     xml.title('Example Feed')
+    ...     xml.updated('2003-12-13T18:30:02Z')
+    ...     with xml.author:
+    ...         xml.name('John Doe')
+    ...     xml.id('urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6')
+    ...     with xml.entry:
+    ...         xml.title('Atom-Powered Robots Run Amok')
+    ...         xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
+    ...         xml.updated('2003-12-13T18:30:02Z')
+    ...         xml.summary('Some text.')
+    <...
+    >>> print xml
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <title>Example Feed</title>
+      <updated>2003-12-13T18:30:02Z</updated>
+      <author>
+        <name>John Doe</name>
+      </author>
+      <id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>
+      <entry>
+        <title>Atom-Powered Robots Run Amok</title>
+        <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+        <updated>2003-12-13T18:30:02Z</updated>
+        <summary>Some text.</summary>
+      </entry>
+    </feed>
+    <BLANKLINE>
+
+Content should be escaped on output
+    >>> xml = builder()
+    >>> with xml.doc:#doctest:+ELLIPSIS
+    ...     xml.item('Text&to<escape',
+    ...              some_attr='attribute&value>to<escape')
+    <...
+    >>> print xml
+    <doc>
+      <item some_attr="attribute&amp;value&gt;to&lt;escape">Text&amp;to&lt;escape</item>
+    </doc>
+    <BLANKLINE>
+
+Use dict access on the builder & Clark's notation for namespaces
+    >>> xml = builder()
+    >>> with xml.doc:#doctest:+ELLIPSIS
+    ...     xml['{http://example.com}item']('stuff here', some_attr='')
+    <...
+    >>> print xml
+    <doc>
+      <ns0:item some_attr="" xmlns:ns0="http://example.com">stuff here</ns0:item>
+    </doc>
+    <BLANKLINE>
+    >>> xml = builder()
+    >>> with xml['{http://example.com}doc']:#doctest:+ELLIPSIS
+    ...     xml['{http://example.com}item']('stuff here')
+    <...
+    >>> print xml
+    <ns0:doc xmlns:ns0="http://example.com">
+      <ns0:item>stuff here</ns0:item>
+    </ns0:doc>
+    <BLANKLINE>
+
+Also allow tuple notation (namespace, element) for namespaced element names
+    >>> xml = builder()
+    >>> with xml.doc:#doctest:+ELLIPSIS
+    ...     xml[('http://example.com','item')]('stuff here', some_attr='')
+    <...
+    >>> print xml
+    <doc>
+      <ns0:item some_attr="" xmlns:ns0="http://example.com">stuff here</ns0:item>
+    </doc>
+    <BLANKLINE>
+    >>> xml = builder()
+    >>> ns = 'http://example.com'
+    >>> with xml[(ns,'doc')]:#doctest:+ELLIPSIS
+    ...     xml[(ns,'item')]('stuff here')
+    <...
+    >>> print xml
+    <ns0:doc xmlns:ns0="http://example.com">
+      <ns0:item>stuff here</ns0:item>
+    </ns0:doc>
+    <BLANKLINE>
+
+The attributes of an xmlbuilder.element objects can be accessed by using
+dict notation, which allows the specification of namespaced attributes.
+
+Much like namespaced elements, namespaced attributes can be specified using
+either Clark's notation:
+    >>> xml = builder()
+    >>> with xml.doc as doc:#doctest:+ELLIPSIS
+    ...     doc['{http://example.com}attr'] = '42'
+    ...     item = xml.item
+    ...     item['{http://example.com}attr'] = 'foo'
+    >>> print xml
+    <doc ns0:attr="42" xmlns:ns0="http://example.com">
+      <item ns0:attr="foo" />
+    </doc>
+    <BLANKLINE>
+
+or using (namespace, element) tuples:
+    >>> xml = builder()
+    >>> ns = 'http://example.com'
+    >>> with xml.doc as doc:#doctest:+ELLIPSIS
+    ...     doc[(ns, 'attr')] = '42'
+    ...     item = xml.item
+    ...     item[(ns, 'attr')] = 'foo'
+    >>> print xml
+    <doc ns0:attr="42" xmlns:ns0="http://example.com">
+      <item ns0:attr="foo" />
+    </doc>
+    <BLANKLINE>
+
+Test the "enhanced" (with custom namespaces) Atom feed demo
+    >>> xml = builder()
+    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):#doctest:+ELLIPSIS
+    ...     xml.title('Example Feed')
+    ...     xml.link(href='http://example.org/')
+    ...     xml.updated('2003-12-13T18:30:02Z')
+    ...     with xml.author:
+    ...         xml.name('John Doe')
+    ...     xml.id('urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6')
+    ...     with xml.entry:
+    ...         xml["{http://example.org}namespace"]("Hello these are namespaces!")
+    ...         xml.title('Atom-Powered Robots Run Amok')
+    ...         xml.link(href='http://example.org/2003/12/13/atom03')
+    ...         xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
+    ...         xml.updated('2003-12-13T18:30:02Z')
+    ...         xml.summary('Some text.')
+    <...
+    >>> print xml
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <title>Example Feed</title>
+      <link href="http://example.org/" />
+      <updated>2003-12-13T18:30:02Z</updated>
+      <author>
+        <name>John Doe</name>
+      </author>
+      <id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>
+      <entry>
+        <ns0:namespace xmlns:ns0="http://example.org">Hello these are namespaces!</ns0:namespace>
+        <title>Atom-Powered Robots Run Amok</title>
+        <link href="http://example.org/2003/12/13/atom03" />
+        <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+        <updated>2003-12-13T18:30:02Z</updated>
+        <summary>Some text.</summary>
+      </entry>
+    </feed>
+    <BLANKLINE>
