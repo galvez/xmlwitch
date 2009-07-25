@@ -13,6 +13,7 @@ class builder:
   def __init__(self, version, encoding):
     self._document = StringIO()
     self._document.write('<?xml version="%s" encoding="%s"?>\n' % (version, encoding))
+    self._encoding = encoding
     self._unicode = (encoding == 'utf-8')
     self._indentation = 0
     self._indent = '  '
@@ -20,14 +21,11 @@ class builder:
     return element(name, self)
   __getitem__ = __getattr__
   def __str__(self):
-    if self._unicode:
-      return self._document.getvalue().encode('utf-8')
-    return self._document.getvalue()
+    return self._document.getvalue().encode(self._encoding)
   def __unicode__(self):
-    return self._document.getvalue().decode('utf-8')
+    return self._document.getvalue().decode(self._encoding)
   def _write(self, line):
-    if self._unicode:
-      line = line.decode('utf-8')
+    line = line.decode(self._encoding)
     self._document.write('%s%s\n' % (self._indentation * self._indent, line))
 
 class element:
