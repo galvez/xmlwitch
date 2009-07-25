@@ -2,6 +2,7 @@ from __future__ import with_statement
 from StringIO import StringIO
 from exceptions import UnicodeDecodeError
 from xml.sax.saxutils import escape
+from xml.etree.ElementTree import ElementTree, Element, QName, tostring
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
@@ -9,84 +10,85 @@ __license__ = "GPL"
 
 import sys
 
+# Because the elementtree included in Python doesn't have a pretty printer
+def indent(elem, level=0):
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+
 class builder:
-  def __init__(self, version, encoding):
-    self.document = StringIO()
-    self.document.write('<?xml version="%s" encoding="%s"?>\n' % (version, encoding))
-    self.unicode = (encoding == 'utf-8')
-    self.indentation = -2
+  def __init__(self, encoding='utf-8', version='1.0'):
+    self._tree = None
+    self._context = []
+    self._encoding = encoding
+
   def __getattr__(self, name):
     return element(name, self)
   def __getitem__(self, name):
     return element(name, self)
+
   def __str__(self):
-    if self.unicode:
-      return self.document.getvalue().encode('utf-8')
-    return self.document.getvalue()
+    output = StringIO()
+    indent(self._tree.getroot())
+    self._tree.write(output, self._encoding)
+    return output.getvalue()
   def __unicode__(self):
-    return self.document.getvalue().decode("utf-8")
-  def write(self, line):
-    if self.unicode:
-      line = line.decode('utf-8')
-    self.document.write('%s%s' % ((self.indentation * ' '), line))
+    return str(self).decode("utf-8")
+
+  def _send(self, element):
+    """ Receive a new element to add to the current context
+
+    Add the element as subelement of the context tip.
+    If there is no context, there should be no tree. Create the tree
+    and add element as its root.
+
+    If there's an empty context but there's a tree, it means we're writing
+    out of the tree root, which is an error.
+    """
+    if not self._context:
+      assert not self._tree
+      self._tree = ElementTree(element._node)
+    else:
+      self._context[-1].append(element._node)
+
+  def _push(self, element):
+    """ Push an `element` instance on the context stack
+
+    this element will be used as reference for new elements until it's popped
+    """
+    self._context.append(element._node)
+  def _pop(self, element):
+    assert element._node is self._context[-1]
+    self._context.pop()
 
 _dummy = {}
 
 class element:
   def __init__(self, name, builder):
-    self.name = name
+    self._node = Element(name)
     self.builder = builder
-    self.attributes = {}
-  def __enter__(self):
-    self.builder.indentation += 2
-    if self.attributes:
-      self.builder.write('<%s %s>\n' % (self.name, self.serialized_attributes))
-    else:
-      self.builder.write('<%s>\n' % self.name)
-  def __exit__(self, type, value, tb):
-    self.builder.write('</%s>\n' % self.name)
-    self.builder.indentation -= 2
-  def __call__(self, value=_dummy, **kwargs):
-    self.attributes.update(kwargs)
+    self.builder._send(self)
 
-    if value == None:
-      self.builder.indentation += 2
-      if self.attributes:
-        self.builder.write('<%s %s />\n' % (self.name, self.serialized_attributes))
-      else:
-        self.builder.write('<%s />\n' % self.name)
-      self.builder.indentation -= 2
-    elif value != _dummy:
-      self.builder.indentation += 2
-      if self.attributes:
-        self.builder.write('<%s %s>%s</%s>\n' % (self.name, self.serialized_attributes, escape(value), self.name))
-      else:
-        self.builder.write('<%s>%s</%s>\n' % (self.name, escape(value), self.name))
-      self.builder.indentation -= 2
-      return
+  def __enter__(self):
+    self.builder._push(self)
+  def __exit__(self, type, value, tb):
+    self.builder._pop(self)
+
+  def __call__(self, value=None, **kwargs):
+    self._node.attrib.update(kwargs)
+    self._node.text = value
+
     return self
 
-  @property
-  def serialized_attributes(self):
-    serialized = []
-    for attr, value in self.attributes.items():
-      serialized.append('%s="%s"' % (attr, escape(value)))
-    return ' '.join(serialized)
-
-if __name__ == "__main__":
-  xml = builder(version="1.0", encoding="utf-8")
-  with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
-    xml.title('Example Feed')
-    xml.link(None, href='http://example.org/')
-    xml.updated('2003-12-13T18:30:02Z')
-    with xml.author:
-      xml.name('John Doe')
-    xml.id('urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6')
-    with xml.entry:
-      xml["my:namespace"]("Hello these are namespaces!")
-      xml.title('Atom-Powered Robots Run Amok')
-      xml.link(None, href='http://example.org/2003/12/13/atom03')
-      xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
-      xml.updated('2003-12-13T18:30:02Z')
-      xml.summary('Some text.')
-  print xml
+  def __repr__(self):
+    return repr(self._node)
