@@ -99,5 +99,14 @@ class element:
 
     return self
 
+  def __setitem__(self, attribute, value):
+    if type(attribute) == tuple:
+      attribute = QName(*attribute)
+    self._node.set(attribute, value)
+  def __getitem__(self, attribute):
+    if type(attribute) == tuple:
+      attribute = QName(*attribute)
+    return self._node.get(attribute)
+
   def __repr__(self):
     return repr(self._node)

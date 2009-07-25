@@ -112,3 +112,31 @@ Also allow tuple notation (namespace, element) for namespaced element names
     </ns0:doc>
     <BLANKLINE>
 
+The attributes of an xmlbuilder.element objects can be accessed by using
+dict notation, which allows the specification of namespaced attributes.
+
+Much like namespaced elements, namespaced attributes can be specified using
+either Clark's notation:
+    >>> xml = builder()
+    >>> with xml.doc as doc:#doctest:+ELLIPSIS
+    ...     doc['{http://example.com}attr'] = '42'
+    ...     item = xml.item
+    ...     item['{http://example.com}attr'] = 'foo'
+    >>> print xml
+    <doc ns0:attr="42" xmlns:ns0="http://example.com">
+      <item ns0:attr="foo" />
+    </doc>
+    <BLANKLINE>
+
+or using (namespace, element) tuples:
+    >>> xml = builder()
+    >>> ns = 'http://example.com'
+    >>> with xml.doc as doc:#doctest:+ELLIPSIS
+    ...     doc[(ns, 'attr')] = '42'
+    ...     item = xml.item
+    ...     item[(ns, 'attr')] = 'foo'
+    >>> print xml
+    <doc ns0:attr="42" xmlns:ns0="http://example.com">
+      <item ns0:attr="foo" />
+    </doc>
+    <BLANKLINE>
