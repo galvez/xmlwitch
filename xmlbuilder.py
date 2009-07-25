@@ -74,7 +74,6 @@ class builder:
       self._tree = ElementTree(element._node)
     else:
       self._context[-1].append(element._node)
-
   def _push(self, element):
     """ Push an `element` instance on the context stack
 
@@ -84,8 +83,6 @@ class builder:
   def _pop(self, element):
     assert element._node is self._context[-1]
     self._context.pop()
-
-_dummy = {}
 
 class element:
   def __init__(self, name, builder):
