@@ -5,6 +5,9 @@ from keyword import kwlist as PYTHON_KWORD_LIST
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
+__contributors__ = [('Beat Bolli', 'http://drbeat.li/'),]
+
+
 __license__ = "GPL"
 
 class builder:
