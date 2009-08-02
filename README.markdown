@@ -2,7 +2,7 @@
 
 [xmlwitch](http://pypi.python.org/pypi/xmlwitch/) is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/) library written and mantained by [Jonas Galvez](http://jonasgalvez.com.br/). It uses a very different technique (Python's context processors) but delivers an extremely similar syntax. xmlwitch leverages the with statement which makes it dependent on Python 2.5 and above.
 
-Since the number of patches and other contributions have been greater than what I expected, I've created a mailing-list to help coordinate further improvements (if at all necessary): http://groups.google.com/group/xmlwitch-dev.
+Since the number of patches and other contributions have been greater than what I expected, I've created a mailing-list to help coordinate further improvements (if at all necessary): [http://groups.google.com/group/xmlwitch-dev].
 
 ## history
 
