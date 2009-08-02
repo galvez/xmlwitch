@@ -1,8 +1,8 @@
-=xmlwitch
+# xmlwitch
 
 xmlwitch is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/) library written and mantained by [Jonas Galvez][http://jonasgalvez.com.br/]. It uses a very different technique (Python's context processors) but delivers an extremely similar syntax. xmlwitch leverages the with statement which makes it dependent on Python 2.5 and above.
 
-==the says-it-all usage example
+## the says-it-all usage example
 
   xml = builder(version="1.0", encoding="utf-8")
   with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
@@ -28,14 +28,14 @@ xmlwitch is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/
           xml.input(None, type='text', value='')
   print xml # str(xml)
   
-==contributing guidelines
+## contributing guidelines
 
 - 2-space identation, please (or I'll shoot you!)
 - no global functions, keep things logically namespaced
 - avoid list comprehensions that can't be written in a single line (e.g., 79 columns)
 - no clever tricks or deep monkey patching of python's standard library 
 
-==contributors
+## contributors
 
 - [Beat Bolli][http://github.com/bbolli]
 - [masklinn][http://github.com/masklinn]
