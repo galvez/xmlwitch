@@ -1,4 +1,4 @@
-  if __name__ == "__main__":
+
     xml = builder(version="1.0", encoding="utf-8")
     with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
       xml.title('Example Feed')
