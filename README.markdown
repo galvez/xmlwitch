@@ -1,6 +1,6 @@
 # xmlwitch
 
-xmlwitch is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/) library written and mantained by [Jonas Galvez][http://jonasgalvez.com.br/]. It uses a very different technique (Python's context processors) but delivers an extremely similar syntax. xmlwitch leverages the with statement which makes it dependent on Python 2.5 and above.
+xmlwitch is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/) library written and mantained by [Jonas Galvez](http://jonasgalvez.com.br/). It uses a very different technique (Python's context processors) but delivers an extremely similar syntax. xmlwitch leverages the with statement which makes it dependent on Python 2.5 and above.
 
 ## the says-it-all usage example
 
@@ -37,5 +37,5 @@ xmlwitch is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/
 
 ## contributors
 
-- [Beat Bolli][http://github.com/bbolli]
-- [masklinn][http://github.com/masklinn]
+- [Beat Bolli](http://github.com/bbolli/)
+- [masklinn](http://github.com/masklinn/)
