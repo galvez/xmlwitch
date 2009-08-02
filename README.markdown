@@ -1,6 +1,20 @@
 # xmlwitch
 
-xmlwitch is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/) library written and mantained by [Jonas Galvez](http://jonasgalvez.com.br/). It uses a very different technique (Python's context processors) but delivers an extremely similar syntax. xmlwitch leverages the with statement which makes it dependent on Python 2.5 and above.
+[xmlwitch](http://pypi.python.org/pypi/xmlwitch/) is a reimplementation of [Ruby's Builder](http://builder.rubyforge.org/) library written and mantained by [Jonas Galvez](http://jonasgalvez.com.br/). It uses a very different technique (Python's context processors) but delivers an extremely similar syntax. xmlwitch leverages the with statement which makes it dependent on Python 2.5 and above.
+
+## history
+
+CHANGES:
+ 
+* Uses xml.etree.ElementTree rather than text mangling
+ 
+* Encoding and version are now optional (defaulting to utf-8 and 1.0)
+ 
+* Unless the encoding is altered, the XML prefix won't be included (it's optional anyway)
+ 
+* Cases such as namespace handling have been removed for now (to be reintroduced via full qnames)
+ 
+* Added some doctests
 
 ## the says-it-all usage example
 
