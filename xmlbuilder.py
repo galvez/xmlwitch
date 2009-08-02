@@ -6,22 +6,6 @@ __all__ = ['__author__', '__license__', 'builder', 'element']
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
 __license__ = "GPL"
 
-text_escape = (                 # special characters in text
-  ('&', '&amp;'),
-  ('<', '&lt;'),
-  ('>', '&gt;'),
-)
-attr_escape = text_escape + (   # special characters in attribute values
-  ('"', '&quot;'),
-  ("'", '&apos;'),
-)
-
-def escape(s, escapes=text_escape):
-    """Escape special characters in s."""
-    for orig, esc in escapes:
-        s = s.replace(orig, esc)
-    return s
-
 class builder:
   def __init__(self, version, encoding):
     self.document = StringIO()
@@ -43,9 +27,18 @@ class builder:
       line = line.decode('utf-8')
     self.document.write('%s%s' % ((self.indentation * self.indent), line))
 
-_dummy = {}
-
 class element:
+  _dummy = {}
+  # todo: figure out if we can get this from some built-in python lib
+  TEXT_ESCAPE = ( # special characters in text
+    ('&', '&amp;'),
+    ('<', '&lt;'),
+    ('>', '&gt;'),
+  )
+  ATTR_ESCAPE = TEXT_ESCAPE + ( # special characters in attribute values
+    ('"', '&quot;'),
+    ("'", '&apos;'),
+  )
   def __init__(self, name, builder):
     self.name = name
     self.builder = builder
@@ -61,15 +54,20 @@ class element:
       self.serialized_attrs = self.serialize_attrs(kargs)
     if value == None:
       self.builder.write('<%s%s />\n' % (self.name, self.serialized_attrs))
-    elif value != _dummy:
-      self.builder.write('<%s%s>%s</%s>\n' % (self.name, self.serialized_attrs, escape(value), self.name))
+    elif value != element._dummy:
+      self.builder.write('<%s%s>%s</%s>\n' % (self.name, self.serialized_attrs, self.escape(value), self.name))
       return
     return self
   def serialize_attrs(self, attrs):
     serialized = []
     for attr, value in attrs.items():
-      serialized.append(' %s="%s"' % (attr, escape(value, attr_escape)))
+      serialized.append(' %s="%s"' % (attr, self.escape(value, element.ATTR_ESCAPE)))
     return ''.join(serialized)
+  def escape(self, s, escapes=TEXT_ESCAPE):
+    """Escape special characters in s."""
+    for orig, esc in escapes:
+      s = s.replace(orig, esc)
+      return s
 
 if __name__ == "__main__":
   xml = builder(version="1.0", encoding="utf-8")
