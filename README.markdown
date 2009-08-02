@@ -4,16 +4,12 @@
 
 ## history
 
-CHANGES:
+* **TODO: go over galvez/master and update this section with dates and proper credits**
  
 * Uses xml.etree.ElementTree rather than text mangling
- 
 * Encoding and version are now optional (defaulting to utf-8 and 1.0)
- 
 * Unless the encoding is altered, the XML prefix won't be included (it's optional anyway)
- 
 * Cases such as namespace handling have been removed for now (to be reintroduced via full qnames)
- 
 * Added some doctests
 
 ## the says-it-all usage example
