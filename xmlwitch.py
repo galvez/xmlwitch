@@ -27,7 +27,7 @@ def _indent(elem, indentation=2, level=0):
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for elem in elem:
-            indent(elem, indentation, level+1)
+            _indent(elem, indentation, level+1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
