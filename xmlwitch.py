@@ -12,11 +12,14 @@ except ImportError:
   from xml.etree.ElementTree import ElementTree, Element, QName, tostring
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
+__license__ = 'BSD'
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
-__license__ = "GPL"
+__contributors__ = [('Beat Bolli', 'http://drbeat.li/'), # bbolli, maskliin, change this as you like
+
+                    ('masklinn', 'http://github.com/masklinn')]
 
 # Because the elementtree included in Python doesn't have a pretty printer
-def indent(elem, indentation=2, level=0):
+def _indent(elem, indentation=2, level=0):
     i = "\n" + level*indentation*" "
     if len(elem):
         if not elem.text or not elem.text.strip():
@@ -31,7 +34,7 @@ def indent(elem, indentation=2, level=0):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
-def normalize(name):
+def _normalize(name):
   """ Normalize a builder qname to ensure that it can be used by ElementTree:
   * If it's a tuple, build a QName object from it
   * Otherwise, pass it through (ET will handle names and clark's notation names)
@@ -53,7 +56,7 @@ class builder:
 
   def tostring(self, indentation=2):
     output = StringIO()
-    indent(self._tree.getroot(), indentation)
+    _indent(self._tree.getroot(), indentation)
     self._tree.write(output, self._encoding)
     return output.getvalue()
   def __str__(self):
@@ -88,7 +91,7 @@ class builder:
 
 class element:
   def __init__(self, name, builder):
-    self._node = Element(normalize(name))
+    self._node = Element(_normalize(name))
 
     self.builder = builder
     self.builder._send(self)
@@ -106,9 +109,9 @@ class element:
     return self
 
   def __setitem__(self, attribute, value):
-    self._node.set(normalize(attribute), value)
+    self._node.set(_normalize(attribute), value)
   def __getitem__(self, attribute):
-    return self._node.get(normalize(attribute))
+    return self._node.get(_normalize(attribute))
 
   def __repr__(self):
     return repr(self._node)
