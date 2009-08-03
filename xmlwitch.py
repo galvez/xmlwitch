@@ -4,7 +4,7 @@ from xml.sax import saxutils
 from keyword import kwlist as PYTHON_KWORD_LIST
 
 __all__ = ['__author__', '__license__', 'builder', 'element']
-__license__ = 'GPL'
+__license__ = 'BSD'
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
 __contributors__ = [('Beat Bolli', 'http://drbeat.li/'), # bbolli, maskliin, change this as you like
                     ('masklinn', 'http://github.com/masklinn')]
