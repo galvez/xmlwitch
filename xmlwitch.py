@@ -1,3 +1,5 @@
+# -*- coding: utf-8; c-basic-offset: 2; indent-tabs-mode: nil -*-
+
 from __future__ import with_statement
 from exceptions import UnicodeDecodeError
 
@@ -14,25 +16,24 @@ except ImportError:
 __all__ = ['__author__', '__license__', 'builder', 'element']
 __license__ = 'BSD'
 __author__ = ('Jonas Galvez', 'jonas@codeazur.com.br', 'http://jonasgalvez.com.br')
-__contributors__ = [('Beat Bolli', 'http://drbeat.li/'), # bbolli, maskliin, change this as you like
-
+__contributors__ = [('Beat Bolli', 'http://drbeat.li/'),
                     ('masklinn', 'http://github.com/masklinn')]
 
 # Because the elementtree included in Python doesn't have a pretty printer
 def _indent(elem, indentation=2, level=0):
-    i = "\n" + level*indentation*" "
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + indentation*" "
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for elem in elem:
-            _indent(elem, indentation, level+1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
+  i = "\n" + level*indentation*" "
+  if len(elem):
+    if not elem.text or not elem.text.strip():
+      elem.text = i + indentation*" "
+    if not elem.tail or not elem.tail.strip():
+      elem.tail = i
+    for elem in elem:
+      _indent(elem, indentation, level+1)
+    if not elem.tail or not elem.tail.strip():
+      elem.tail = i
+  else:
+    if level and (not elem.tail or not elem.tail.strip()):
+      elem.tail = i
 
 def _normalize(name):
   """ Normalize a builder qname to ensure that it can be used by ElementTree:
