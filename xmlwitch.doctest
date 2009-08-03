@@ -1,9 +1,9 @@
-XMLBuilder is a reimplementation of Ruby's Builder (http://builder.rubyforge.org/).
+XMLWitch is a reimplementation of Ruby's Builder (http://builder.rubyforge.org/).
 
 Its goal is to allow the easy and litteral generation of XML data and
 documents using pure Python code.
 
-XMLBuilder leverages the WITH statement (and context processors), it therefore
+XMLWitch leverages the WITH statement (and context processors), it therefore
 requires Python 2.5 or more recent.
 
     >>> from xmlwitch import builder
