@@ -2,6 +2,7 @@
 
 from __future__ import with_statement
 from exceptions import UnicodeDecodeError
+from keyword import kwlist
 
 try:
   from cStringIO import StringIO
@@ -43,6 +44,15 @@ def _normalize(name):
   if type(name) == tuple:
     return QName(*name)
   return name
+
+KEYWORD_UNMANGLER = dict((k + '_', k) for k in kwlist)
+def _unmangle_attribute_name(key):
+  """ To use Python keywords as attribute names, they can be postfixed with an
+  underscore. Undo that to store the correct attribute name
+  """
+  if key in KEYWORD_UNMANGLER:
+    return KEYWORD_UNMANGLER[key]
+  return key
 
 class builder:
   def __init__(self, encoding='utf-8', version='1.0'):
@@ -104,6 +114,8 @@ class element:
     self.builder._pop(self)
 
   def __call__(self, _text=None, **kwargs):
+    kwargs = dict((_unmangle_attribute_name(key), value)
+                  for key, value in kwargs.iteritems())
     self._node.attrib.update(kwargs)
     self._node.text = _text
 
