@@ -183,7 +183,7 @@ from etree_rewrite (thanks mqictl who found it:
 http://www.reddit.com/r/Python/comments/ct87v/any_nice_dsl_for_generating_xml/c0v4w0a)
     >>> xml = builder()
     >>> ens = 'http://example.org/ns/'
-    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
+    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):#doctest:+ELLIPSIS
     ...     xml.title('Example Feed')
     ...     xml.link(None, href='http://example.org/')
     ...     xml.updated('2003-12-13T18:30:02Z')
