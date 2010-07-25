@@ -219,7 +219,7 @@ http://www.reddit.com/r/Python/comments/ct87v/any_nice_dsl_for_generating_xml/c0
       <entry>
         <ns0:elem ns0:attr="what?" xmlns:ns0="http://example.org/ns/">Hello these are namespaces!</ns0:elem>
         <ns0:elem ns0:attr="what?" xmlns:ns0="http://example.org/ns/">Hello these are namespaces!</ns0:elem>
-        <quoting attr="&lt; &gt; &amp; ' &quot;">&lt; &gt; &amp; ' "</quoting>
+        <quoting attr="&lt; &gt; &amp; &apos; &quot;">&lt; &gt; &amp; ' "</quoting>
         <title>Atom-Powered Robots Run Amok</title>
         <link href="http://example.org/2003/12/13/atom03" />
         <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
