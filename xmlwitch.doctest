@@ -260,9 +260,7 @@ http://www.reddit.com/r/Python/comments/ct87v/any_nice_dsl_for_generating_xml/c0
         <summary>Some text.</summary>
         <content type="xhtml">
           <div xmlns="http://www.w3.org/1999/xhtml">
-            <label for="some_field">Some label</label>
-            :
-            <input id="some_field" type="text" value="" />
+            <label for="some_field">Some label</label>:<input id="some_field" type="text" value="" />
           </div>
         </content>
       </entry>
