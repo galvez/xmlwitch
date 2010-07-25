@@ -103,9 +103,9 @@ class element:
   def __exit__(self, type, value, tb):
     self.builder._pop(self)
 
-  def __call__(self, value=None, **kwargs):
+  def __call__(self, _text=None, **kwargs):
     self._node.attrib.update(kwargs)
-    self._node.text = value
+    self._node.text = _text
 
     return self
 
