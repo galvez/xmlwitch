@@ -117,8 +117,25 @@ class element:
     kwargs = dict((_unmangle_attribute_name(key), value)
                   for key, value in kwargs.iteritems())
     self._node.attrib.update(kwargs)
-    self._node.text = _text
+    self.text(_text)
 
+    return self
+
+  def text(self, value):
+    """ Append a text node to the element
+    """
+    # if no children, append value to text
+    if not len(self._node):
+      if self._node.text:
+        self._node.text += value
+      else:
+        self._node.text = value
+    else:
+      # otherwise ET sucks at text, append value to tail
+      # of last child...
+      last_child = self._node[-1]
+      if last_child.tail: last_child.tail += value
+      else: last_child.tail = value
     return self
 
   def __setitem__(self, attribute, value):

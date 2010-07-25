@@ -178,6 +178,39 @@ Test the "enhanced" (with custom namespaces) Atom feed demo
     </feed>
     <BLANKLINE>
 
+Check element.text() support
+    >>> xml = builder()
+    >>> with xml.doc as doc:#doctest:+ELLIPSIS
+    ...     doc.text('foo')
+    <...
+    >>> print xml
+    <doc>foo</doc>
+
+Appending text to an element which already has text
+    >>> xml = builder()
+    >>> with xml.doc('foo') as doc:#doctest:+ELLIPSIS
+    ...     doc.text(' bar')
+    <...
+    >>> print xml
+    <doc>foo bar</doc>
+
+Appending text to an element after having appended an element
+    >>> xml = builder()
+    >>> with xml.doc('leading') as doc:#doctest:+ELLIPSIS
+    ...     doc.text(' text')
+    ...     xml.title('example feed')
+    ...     doc.text('middle')
+    ...     doc.text(' text')
+    ...     xml.link(href='http://example.org')
+    ...     doc.text('closing')
+    <...
+    >>> print xml
+    <doc>leading text<title>example feed</title>middle text<link href="http://example.org" />closing</doc>
+    <BLANKLINE>
+
+(it doesn't look like the pretty-printer I got for ET is very good at
+dealing with text nodes))
+
 And finally the says-it-all example, which uncovered features missing
 from etree_rewrite (thanks mqictl who found it:
 http://www.reddit.com/r/Python/comments/ct87v/any_nice_dsl_for_generating_xml/c0v4w0a)
