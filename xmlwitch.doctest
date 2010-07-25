@@ -177,3 +177,61 @@ Test the "enhanced" (with custom namespaces) Atom feed demo
       </entry>
     </feed>
     <BLANKLINE>
+
+And finally the says-it-all example, which uncovered features missing
+from etree_rewrite (thanks mqictl who found it:
+http://www.reddit.com/r/Python/comments/ct87v/any_nice_dsl_for_generating_xml/c0v4w0a)
+    >>> xml = builder()
+    >>> ens = 'http://example.org/ns/'
+    >>> with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
+    ...     xml.title('Example Feed')
+    ...     xml.link(None, href='http://example.org/')
+    ...     xml.updated('2003-12-13T18:30:02Z')
+    ...     with xml.author:
+    ...          xml.name('John Doe')
+    ...     xml.id('urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6')
+    ...     with xml.entry:
+    ...          elem1 = xml['{http://example.org/ns/}elem']("Hello these are namespaces!")
+    ...          elem1['{http://example.org/ns/}attr'] = 'what?'
+    ...          elem2 = xml[(ens, 'elem')]("Hello these are namespaces!")
+    ...          elem2[(ens, 'attr')] = 'what?'
+    ...          xml.quoting("< > & ' \"", attr="< > & ' \"")
+    ...          xml.title('Atom-Powered Robots Run Amok')
+    ...          xml.link(None, href='http://example.org/2003/12/13/atom03')
+    ...          xml.id('urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a')
+    ...          xml.updated('2003-12-13T18:30:02Z')
+    ...          xml.summary('Some text.')
+    ...          with xml.content(type='xhtml'):
+    ...               with xml.div(xmlns='http://www.w3.org/1999/xhtml') as div:
+    ...                    xml.label('Some label', for_='some_field')
+    ...                    div.text(':')
+    ...                    xml.input(None, type='text', value='')
+    <...
+    >>> print xml
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <title>Example Feed</title>
+      <link href="http://example.org/" />
+      <updated>2003-12-13T18:30:02Z</updated>
+      <author>
+        <name>John Doe</name>
+      </author>
+      <id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>
+      <entry>
+        <ns0:elem ns0:attr="what?" xmlns:ns0="http://example.org/ns/">Hello these are namespaces!</ns0:elem>
+        <ns0:elem ns0:attr="what?" xmlns:ns0="http://example.org/ns/">Hello these are namespaces!</ns0:elem>
+        <quoting attr="&lt; &gt; &amp; ' &quot;">&lt; &gt; &amp; ' "</quoting>
+        <title>Atom-Powered Robots Run Amok</title>
+        <link href="http://example.org/2003/12/13/atom03" />
+        <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+        <updated>2003-12-13T18:30:02Z</updated>
+        <summary>Some text.</summary>
+        <content type="xhtml">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <label for="some_field">Some label</label>
+            :
+            <input type="text" value="" />
+          </div>
+        </content>
+      </entry>
+    </feed>
+    <BLANKLINE>
