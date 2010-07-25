@@ -205,7 +205,7 @@ http://www.reddit.com/r/Python/comments/ct87v/any_nice_dsl_for_generating_xml/c0
     ...               with xml.div(xmlns='http://www.w3.org/1999/xhtml') as div:
     ...                    xml.label('Some label', for_='some_field')
     ...                    div.text(':')
-    ...                    xml.input(type='text', value='')
+    ...                    xml.input(id='some_field', type='text', value='')
     <...
     >>> print xml
     <feed xmlns="http://www.w3.org/2005/Atom">
@@ -229,7 +229,7 @@ http://www.reddit.com/r/Python/comments/ct87v/any_nice_dsl_for_generating_xml/c0
           <div xmlns="http://www.w3.org/1999/xhtml">
             <label for="some_field">Some label</label>
             :
-            <input type="text" value="" />
+            <input id="some_field" type="text" value="" />
           </div>
         </content>
       </entry>
