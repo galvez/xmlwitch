@@ -74,7 +74,7 @@ class XMLWitchTestCase(unittest.TestCase):
             self.expected_document('namespaces.xml')
         )        
 
-    def test_full_atom_feed(self):
+    def test_atom_feed(self):
         xml = xmlwitch.Builder(version="1.0", encoding="utf-8")
         with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
             xml.title('Example Feed')
@@ -92,6 +92,10 @@ class XMLWitchTestCase(unittest.TestCase):
                     with xml.div(xmlns='http://www.w3.org/1999/xhtml'):
                         xml.label('Some label', for_='some_field')
                         xml.input(None, type='text', value='')
+        self.assertEquals(
+            str(xml), 
+            self.expected_document('atom_feed.xml')
+        )
 
 if __name__ == '__main__':
     unittest.main()
