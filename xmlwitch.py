@@ -50,7 +50,6 @@ class Builder:
 
 class Element:
     
-    _child_elements = {}
     PYTHON_KWORD_MAP = dict([(k + '_', k) for k in PYTHON_KWORD_LIST])
     
     def __init__(self, name, builder):
