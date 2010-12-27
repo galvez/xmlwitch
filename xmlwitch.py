@@ -73,20 +73,19 @@ class Element:
         
     def __call__(*args, **kargs):
         """Add a child element to the document"""
-        if len(args) > 1:
-            self, value = args
-        else:
-            self, value = args[0], Element._child_elements
+        self = args[0]
         self.attributes.update(kargs)
-        if value is None:
-            self.builder.write_indented('<%s%s />' % (
-                self.name, self._serialized_attrs()
-            ))
-        elif value != Element._child_elements:
-            value = saxutils.escape(value)
-            self.builder.write_indented('<%s%s>%s</%s>' % (
-                self.name, self._serialized_attrs(), value, self.name
-            ))
+        if len(args) > 1:
+            value = args[1]
+            if value is None:
+                self.builder.write_indented('<%s%s />' % (
+                    self.name, self._serialized_attrs()
+                ))
+            else:
+                value = saxutils.escape(value)
+                self.builder.write_indented('<%s%s>%s</%s>' % (
+                    self.name, self._serialized_attrs(), value, self.name
+                ))
         return self
 
     def _serialized_attrs(self):
