@@ -87,6 +87,7 @@ class Element:
             self.builder.write_indented('<%s%s>%s</%s>' % (
                 self.name, self._serialized_attrs(), value, self.name
             ))
+        return self
 
     def _serialized_attrs(self):
         """Serialize attributes for element insertion"""
