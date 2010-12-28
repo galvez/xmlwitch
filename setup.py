@@ -1,7 +1,6 @@
 """
-xmlwitch offers Pythonic XML generation through context generators ('with' 
-statement). A minimalist implementation in less than 100 lines of code. 
-BSD-licensed.
+xmlwitch offers Pythonic XML generation through context generators in a 
+minimalist implementation in less than 100 lines of code. BSD-licensed.
 
 Usage
 `````
@@ -50,7 +49,7 @@ setup(
     license = 'BSD',
     author = "Jonas Galvez",
     author_email = "jonasgalvez@gmail.com",
-    description = "xmlwitch offers Pythonic XML generation through context generators ('with' statement)",
+    description = "xmlwitch offers Pythonic XML generation through context generators",
     long_description = __doc__,
     py_modules = ['xmlwitch'],
     platforms = 'Python 2.5 and later',
