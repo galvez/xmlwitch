@@ -48,6 +48,8 @@ class Builder:
         content = content.decode(self._encoding)
         self.write('%s%s\n' % (self._indent * self._indentation, content))
 
+builder = Builder # 0.1 backward compatibility
+
 class Element:
     
     PYTHON_KWORD_MAP = dict([(k + '_', k) for k in PYTHON_KWORD_LIST])
