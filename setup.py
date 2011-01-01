@@ -1,6 +1,6 @@
 """
 xmlwitch offers Pythonic XML generation through context generators in a 
-minimalist implementation in less than 100 lines of code. BSD-licensed.
+minimalist implementation with less than 100 lines of code. BSD-licensed.
 
 Usage
 `````
