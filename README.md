@@ -15,6 +15,6 @@
             xml.summary('Some text.')
     print(xml)
 
-Please refer to http://jonasgalvez.com.br/Software/XMLWitch.html for further info.
+Please refer to [http://jonasgalvez.com.br/Software/XMLWitch.html](http://jonasgalvez.com.br/Software/XMLWitch.html) for further info.
 
 Thanks to [maskllin](http://github.com/masklinn/) and [bbolli](http://github.com/bbolli/) for contributions. Pull requests are welcome.
