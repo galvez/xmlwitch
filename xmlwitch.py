@@ -45,7 +45,6 @@ class Builder:
         
     def write_indented(self, content):
         """Write indented content to the document"""
-        content = content.decode(self._encoding)
         self.write('%s%s\n' % (self._indent * self._indentation, content))
 
 builder = Builder # 0.1 backward compatibility
