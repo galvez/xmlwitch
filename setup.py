@@ -44,7 +44,7 @@ from distutils.core import setup
 
 setup(
     name = 'xmlwitch',
-    version = '0.2',
+    version = '0.2.1',
     url = 'http://jonasgalvez.com.br/Software/XMLWitch.html',
     license = 'BSD',
     author = "Jonas Galvez",

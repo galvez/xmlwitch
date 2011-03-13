@@ -21,13 +21,28 @@ class XMLWitchTestCase(unittest.TestCase):
             return document.read()
             
     def test_simple_document(self):
+            xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
+            with xml.person:
+                xml.name("Bob")
+                xml.city("Qusqu")
+            self.assertEquals(
+                str(xml), 
+                self.expected_document('simple_document.xml')
+            )
+    
+    def test_utf8_document(self):
+        string = u"""An animated fantasy film from 1978 based on the first """ \
+                 u"""half of J.R.R Tolkien\u2019s Lord of the Rings novel. The """ \
+                 u"""film was mainly filmed using rotoscoping, meaning it was """ \
+                 u"""filmed in live action sequences with real actors and then """ \
+                 u"""each frame was individually animated."""
         xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
-        with xml.person:
-            xml.name("Bob")
-            xml.city("Qusqu")
+        with xml.test:
+             xml.description(string)
+        
         self.assertEquals(
-            str(xml), 
-            self.expected_document('simple_document.xml')
+            str(xml),
+            self.expected_document('utf8_document.xml')
         )
     
     def test_nested_elements(self):
@@ -47,7 +62,7 @@ class XMLWitchTestCase(unittest.TestCase):
             str(xml), 
             self.expected_document('nested_elements.xml')
         )
-
+    
     def test_rootless_fragment(self):
         xml = xmlwitch.Builder()
         xml.data(None, value='Just some data')
@@ -73,7 +88,7 @@ class XMLWitchTestCase(unittest.TestCase):
             str(xml), 
             self.expected_document('namespaces.xml')
         )        
-
+    
     def test_atom_feed(self):
         xml = xmlwitch.Builder(version="1.0", encoding="utf-8")
         with xml.feed(xmlns='http://www.w3.org/2005/Atom'):

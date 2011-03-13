@@ -5,7 +5,7 @@ from keyword import kwlist as PYTHON_KWORD_LIST
 
 __all__ = ['Builder', 'Element']
 __license__ = 'BSD'
-__version__ = '0.2'
+__version__ = '0.2.1'
 __author__ = "Jonas Galvez <http://jonasgalvez.com.br/>"
 __contributors__ = ["bbolli <http://github.com/bbolli/>",
                     "masklinn <http://github.com/masklinn/>"]
@@ -36,9 +36,10 @@ class Builder:
         
     def write(self, content):
         """Write raw content to the document"""
-        content = content.decode(self._encoding)
+        if type(content) is not unicode:
+            content = content.decode(self._encoding)
         self._document.write('%s' % content)
-        
+
     def write_escaped(self, content):
         """Write escaped content to the document"""
         self.write(saxutils.escape(content))
