@@ -1,4 +1,5 @@
 *.pyc
+.idea/
 build/*
 dist/*
 MANIFEST
