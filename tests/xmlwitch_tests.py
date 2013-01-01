@@ -119,6 +119,7 @@ class XMLWitchTestCase(unittest.TestCase):
                     with xml.div(xmlns='http://www.w3.org/1999/xhtml'):
                         xml.label('Some label', for_='some_field')
                         xml.input(None, type='text', value='')
+        self.maxDiff = None
         self.assertEquals(
             str(xml),
             self.expected_document('atom_feed.xml')
