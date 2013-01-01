@@ -1,7 +1,14 @@
 from __future__ import with_statement
-from StringIO import StringIO
+import sys
 from xml.sax import saxutils
 from keyword import kwlist as PYTHON_KWORD_LIST
+
+is_py2 = sys.version[0] == '2'
+
+if is_py2:
+    from StringIO import StringIO
+else:
+    from io import StringIO
 
 __all__ = ['Builder', 'Element']
 __license__ = 'BSD'
@@ -11,7 +18,7 @@ __contributors__ = ["bbolli <http://github.com/bbolli/>",
                     "masklinn <http://github.com/masklinn/>"]
 
 class Builder:
-    
+
     def __init__(self, encoding='utf-8', indent=' '*2, version=None):
         self._document = StringIO()
         self._encoding = encoding
@@ -21,29 +28,35 @@ class Builder:
             self.write('<?xml version="%s" encoding="%s"?>\n' % (
                 version, encoding
             ))
-    
+
     def __getattr__(self, name):
         return Element(name, self)
-        
+
     def __getitem__(self, name):
         return Element(name, self)
-    
+
     def __str__(self):
-        return self._document.getvalue().encode(self._encoding).strip()
-        
+        if is_py2:
+            return self._document.getvalue().encode(self._encoding).strip()
+        else:
+            return self._document.getvalue()
+
     def __unicode__(self):
-        return self._document.getvalue().decode(self._encoding).strip()
-        
+        if is_py2:
+            return self._document.getvalue().decode(self._encoding).strip()
+        else:
+            return self._document.getvalue()
+
     def write(self, content):
         """Write raw content to the document"""
-        if type(content) is not unicode:
+        if is_py2 and type(content) is not unicode:
             content = content.decode(self._encoding)
         self._document.write('%s' % content)
 
     def write_escaped(self, content):
         """Write escaped content to the document"""
         self.write(saxutils.escape(content))
-        
+
     def write_indented(self, content):
         """Write indented content to the document"""
         self.write('%s%s\n' % (self._indent * self._indentation, content))
@@ -51,14 +64,14 @@ class Builder:
 builder = Builder # 0.1 backward compatibility
 
 class Element:
-    
+
     PYTHON_KWORD_MAP = dict([(k + '_', k) for k in PYTHON_KWORD_LIST])
-    
+
     def __init__(self, name, builder):
         self.name = self._nameprep(name)
         self.builder = builder
         self.attributes = {}
-        
+
     def __enter__(self):
         """Add a parent element to the document"""
         self.builder.write_indented('<%s%s>' % (
@@ -66,12 +79,12 @@ class Element:
         ))
         self.builder._indentation += 1
         return self
-        
+
     def __exit__(self, type, value, tb):
         """Add close tag to current parent element"""
         self.builder._indentation -= 1
         self.builder.write_indented('</%s>' % self.name)
-        
+
     def __call__(*args, **kargs):
         """Add a child element to the document"""
         self = args[0]

@@ -1,3 +1,7 @@
+xmlwitch
+========
+
+
 **xmlwitch** is a BSD-licensed, Python 2.5+ library that offers idiomatic XML generation through context managers (with statement) in a minimalist implementation with less than 100 lines of code. To install, just run **pip install xmlwitch**, **easy_install xmlwitch** or copy **xmlwitch.py** to your appropriate project's directory. It's just one file.
 
     import xmlwitch
