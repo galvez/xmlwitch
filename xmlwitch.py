@@ -70,12 +70,7 @@ class Element:
     def __init__(self, name, builder):
         self.name = self._nameprep(name)
         self.builder = builder
-
-        try:
-            from collections import OrderedDict
-            self.attributes = OrderedDict()
-        except ImportError:
-            self.attributes = {}
+        self.attributes = {}
 
     def __enter__(self):
         """Add a parent element to the document"""

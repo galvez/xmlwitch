@@ -13,6 +13,7 @@ sys.path.append(ROOT)
 
 import unittest
 import xmlwitch
+import xml.etree.ElementTree as ET
 
 class XMLWitchTestCase(unittest.TestCase):
 
@@ -121,8 +122,8 @@ class XMLWitchTestCase(unittest.TestCase):
                         xml.input(None, type='text', value='')
         self.maxDiff = None
         self.assertEquals(
-            str(xml),
-            self.expected_document('atom_feed.xml')
+            ET.tostring(ET.fromstring(str(xml))),
+            ET.tostring(ET.fromstring(self.expected_document('atom_feed.xml')))
         )
 
 if __name__ == '__main__':
