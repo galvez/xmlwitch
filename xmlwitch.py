@@ -12,8 +12,13 @@ __contributors__ = ["bbolli <http://github.com/bbolli/>",
 
 class Builder:
     
-    def __init__(self, encoding='utf-8', indent=' '*2, version=None):
-        self._document = StringIO()
+    def __init__(self, encoding='utf-8', indent=' '*2, version=None, 
+                 stream=None):
+        if stream is None:
+            self._document = StringIO()
+        else:
+            self._document = stream
+
         self._encoding = encoding
         self._indent = indent
         self._indentation = 0
@@ -29,10 +34,16 @@ class Builder:
         return Element(name, self)
     
     def __str__(self):
-        return self._document.getvalue().encode(self._encoding).strip()
+        if hasattr(self._document, "getvalue"):
+            return self._document.getvalue().encode(self._encoding).strip()
+        else:
+            return "<streaming "+self.__class__.__name__+" object>"
         
     def __unicode__(self):
-        return self._document.getvalue().decode(self._encoding).strip()
+        if hasattr(self._document, "getvalue"):
+            return self._document.getvalue().decode(self._encoding).strip()
+        else:
+            return "<streaming "+self.__class__.__name__+" object>"
         
     def write(self, content):
         """Write raw content to the document"""
