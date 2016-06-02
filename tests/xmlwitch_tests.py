@@ -12,6 +12,7 @@ sys.path.append(ROOT)
 
 import unittest
 import xmlwitch
+import tempfile
 
 class XMLWitchTestCase(unittest.TestCase):
     
@@ -111,6 +112,23 @@ class XMLWitchTestCase(unittest.TestCase):
             str(xml), 
             self.expected_document('atom_feed.xml')
         )
+
+    def test_stream_to_file(self):
+        tf = tempfile.TemporaryFile()
+
+        xml = xmlwitch.Builder(stream=tf, version='1.0', encoding='utf-8')
+        with xml.person:
+            xml.name("Bob")
+            xml.city("Qusqu")
+
+        tf.seek(0)
+        self.assertEquals(
+            tf.read().strip(),
+            self.expected_document('simple_document.xml').strip()
+        )
+
+        self.assertEquals(str(xml), "<streaming Builder object>")
+        
 
 if __name__ == '__main__':
     unittest.main()
