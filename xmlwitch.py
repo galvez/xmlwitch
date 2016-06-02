@@ -96,7 +96,7 @@ class Element:
 
     def __init__(self, name, builder):
         self.name = self._nameprep(name)
-        self.content = []
+        self.content = ''
         self.builder = builder
         self.builder._open_tag and self.builder._open_tag.close()
         self.builder.write_indented('<%s' % self.name)
@@ -104,14 +104,14 @@ class Element:
 
     def close(self):
         if self.content:
-            self.builder.write('>%s</%s>' % (''.join(self.content), self.name))
+            self.builder.write('>%s</%s>' % (self.content, self.name))
         else:
             self.builder.write(' />')
         self.builder._open_tag = None
 
     def __enter__(self):
         """Add a parent element to the document"""
-        self.builder.write('>%s' % ''.join(self.content))
+        self.builder.write('>%s' % self.content)
         self.builder._indentation += 1
         self.builder._open_tag = None
         return self
@@ -129,7 +129,9 @@ class Element:
             self.builder.write(' %s=%s' % (
                 self._nameprep(attr), saxutils.quoteattr(self.builder._to_str(value))
             ))
-        self.content.extend(saxutils.escape(self.builder._to_str(s)) for s in args[1:] if s)
+        for s in args[1:]:
+            if s:
+                self.content += saxutils.escape(self.builder._to_str(s))
         return self
 
     def __del__(self):
