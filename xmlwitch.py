@@ -39,7 +39,7 @@ class Builder:
 
     def __str__(self):
         if not hasattr(self._document, "getvalue"):
-            return "<streaming "+self.__class__.__name__+" object>"
+            return '<streaming %s object>' % self.__class__.__name__
         elif is_py2:
             return self._document.getvalue().encode(self._encoding).strip()
         else:
@@ -47,7 +47,7 @@ class Builder:
 
     def __unicode__(self):
         if not hasattr(self._document, "getvalue"):
-            return "<streaming "+self.__class__.__name__+" object>"
+            return '<streaming %s object>' % self.__class__.__name__
         elif is_py2:
             return self._document.getvalue().decode(self._encoding).strip()
         else:
