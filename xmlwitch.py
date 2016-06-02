@@ -131,7 +131,7 @@ class Element:
     def __call__(*args, **kargs):
         """Add a child element to the document"""
         self = args[0]
-        for attr, value in kargs.items():
+        for attr, value in sorted(kargs.items()):
             self.builder.write(' %s=%s' % (
                 self._nameprep(attr), saxutils.quoteattr(to_str(value, self.builder._encoding))
             ))

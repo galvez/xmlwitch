@@ -109,6 +109,21 @@ class XMLWitchTestCase(unittest.TestCase):
             self.expected_document('namespaces.xml')
         )
 
+    def test_extended_syntax(self):
+        xml = xmlwitch.Builder(indent=' ' * 4)
+        with xml.doc:
+            xml.elem(None, x='x', y='y', z='z')  # Old syntax
+            xml.elem(x='x', y='y', z='z')  # Newly allowed syntax
+            xml.elem(z='z')(y='y')(x='x')  # Order override
+            with xml.container:  # Old syntax
+                xml.elem()  # Newly allowed syntax
+            with xml.container(None):  # Formerly buggy syntax
+                xml.elem(None)  # Old syntax
+        self.assertEquals(
+            str(xml),
+            self.expected_document('extended_syntax.xml')
+        )
+
     def test_atom_feed(self):
         xml = xmlwitch.Builder(version="1.0", encoding="utf-8")
         with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
