@@ -17,9 +17,9 @@ import xml.etree.ElementTree as ET
 
 class XMLWitchTestCase(unittest.TestCase):
 
-    def expected_document(self, filename):
+    def expected_document(self, filename, mode='r'):
         expected = os.path.join(ROOT, 'tests',  'expected',  filename)
-        with open(expected) as document:
+        with open(expected, mode=mode) as document:
             return document.read()
 
     def test_simple_document(self):
@@ -50,14 +50,11 @@ class XMLWitchTestCase(unittest.TestCase):
         )
 
     def test_utf8_document_ascii_encoded(self):
-        if sys.version_info[0] >= 3:
-            return  # Ascii strings not really relevant to python 3
-
-        string = ("""An animated fantasy film from 1978 based on the first """
-                  """half of J.R.R Tolkien\xe2\x80\x99s Lord of the Rings novel. The """
-                  """film was mainly filmed using rotoscoping, meaning it was """
-                  """filmed in live action sequences with real actors and then """
-                  """each frame was individually animated.""")
+        string = (b"""An animated fantasy film from 1978 based on the first """
+                  b"""half of J.R.R Tolkien\xe2\x80\x99s Lord of the Rings novel. The """
+                  b"""film was mainly filmed using rotoscoping, meaning it was """
+                  b"""filmed in live action sequences with real actors and then """
+                  b"""each frame was individually animated.""")
 
         xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
         with xml.test:
@@ -137,7 +134,7 @@ class XMLWitchTestCase(unittest.TestCase):
         )
 
     def test_stream_to_file(self):
-        tf = tempfile.TemporaryFile('w+')
+        tf = tempfile.TemporaryFile('w+b')
 
         xml = xmlwitch.Builder(stream=tf, version='1.0', encoding='utf-8')
         with xml.person:
@@ -146,8 +143,8 @@ class XMLWitchTestCase(unittest.TestCase):
 
         tf.seek(0)
         self.assertEquals(
-            tf.read().strip(),
-            self.expected_document('simple_document.xml').strip()
+            tf.read(),
+            self.expected_document('simple_document.xml', 'rb')
         )
 
         self.assertEquals(str(xml), '<streaming Builder object>')
