@@ -10,3 +10,6 @@ python:
   - 3.5
   - pypy
 script: nosetests tests
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
