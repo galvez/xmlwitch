@@ -18,19 +18,6 @@ if sys.version_info[0] == 2:
 else:
     unicode = str
 
-
-def to_bytes(s, encoding):
-    return s if isinstance(s, bytes) else s.encode(encoding)
-
-
-def to_unicode(s, encoding):
-    return s if isinstance(s, unicode) else s.decode(encoding)
-
-if str == bytes:
-    to_str = to_bytes
-else:
-    to_str = to_unicode
-
 try:
     from io import BytesIO  # Python 3
 except ImportError:
@@ -51,6 +38,7 @@ class Builder:
         self._indentation = 0
         self._open_tag = None
         self._newline = ''
+        self._to_str = self._to_bytes if str == bytes else self._to_unicode
         if version is not None:
             self.write('<?xml version="%s" encoding="%s"?>' % (
                 version, encoding
@@ -62,14 +50,20 @@ class Builder:
     def __getitem__(self, name):
         return Element(name, self)
 
+    def _to_bytes(self, s):
+        return s if isinstance(s, bytes) else s.encode(self._encoding)
+
+    def _to_unicode(self, s):
+        return s if isinstance(s, unicode) else s.decode(self._encoding)
+
     def __bytes__(self):
-        return to_bytes(self.__getvalue(), self._encoding)
+        return self._to_bytes(self.__getvalue())
 
     def __str__(self):
-        return to_str(self.__getvalue(), self._encoding)
+        return self._to_str(self.__getvalue())
 
     def __unicode__(self):
-        return to_unicode(self.__getvalue(), self._encoding)
+        return self._to_unicode(self.__getvalue())
 
     def __getvalue(self):
         self._open_tag and self._open_tag.close()
@@ -83,16 +77,16 @@ class Builder:
 
     def write(self, content):
         """Write raw content to the document"""
-        self._document.write(to_bytes(content, self._encoding))
+        self._document.write(self._to_bytes(content))
         self._newline = '\n'
 
     def write_escaped(self, content):
         """Write escaped content to the document"""
-        self.write(saxutils.escape(content))
+        self.write(saxutils.escape(self._to_str(content)))
 
     def write_indented(self, content):
         """Write indented content to the document"""
-        self.write('%s%s%s' % (self._newline, self._indent * self._indentation, content))
+        self.write('%s%s%s' % (self._newline, self._indent * self._indentation, self._to_str(content)))
 
 builder = Builder  # 0.1 backward compatibility
 
@@ -133,11 +127,9 @@ class Element:
         self = args[0]
         for attr, value in sorted(kargs.items()):
             self.builder.write(' %s=%s' % (
-                self._nameprep(attr), saxutils.quoteattr(to_str(value, self.builder._encoding))
+                self._nameprep(attr), saxutils.quoteattr(self.builder._to_str(value))
             ))
-        self.content.extend([saxutils.escape(
-            to_str(s, self.builder._encoding)
-        ) for s in args[1:] if s])
+        self.content.extend(saxutils.escape(self.builder._to_str(s)) for s in args[1:] if s)
         return self
 
     def __del__(self):
