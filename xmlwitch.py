@@ -18,8 +18,10 @@ class Builder:
         self._encoding = encoding
         self._indent = indent
         self._indentation = 0
+        self._open_element = None
+        self._newline = ''
         if version is not None:
-            self.write('<?xml version="%s" encoding="%s"?>\n' % (
+            self.write('<?xml version="%s" encoding="%s"?>' % (
                 version, encoding
             ))
 
@@ -33,14 +35,21 @@ class Builder:
         return to_str(self.__unicode__(), self._encoding)
 
     def __unicode__(self):
+        if self._open_element:
+            self._open_element.close()
         if hasattr(self._document, "getvalue"):
-            return self._document.getvalue().rstrip()
+            return self._document.getvalue()
         else:
             return '<streaming %s object>' % self.__class__.__name__
+
+    def __del__(self):
+        if self._open_element:
+            self._open_element.close()
 
     def write(self, content):
         """Write raw content to the document"""
         self._document.write(to_unicode(content, self._encoding))
+        self._newline = '\n'
 
     def write_escaped(self, content):
         """Write escaped content to the document"""
@@ -48,7 +57,7 @@ class Builder:
 
     def write_indented(self, content):
         """Write indented content to the document"""
-        self.write('%s%s\n' % (self._indent * self._indentation, content))
+        self.write('%s%s%s' % (self._newline, self._indent * self._indentation, content))
 
 builder = Builder # 0.1 backward compatibility
 
@@ -59,48 +68,49 @@ class Element:
     def __init__(self, name, builder):
         self.name = self._nameprep(name)
         self.builder = builder
-        self.attributes = {}
+        self.content = []
+        if self.builder._open_element:
+            self.builder._open_element.close()
+        self.builder.write_indented('<%s' % self.name)
+        self.builder._open_element = self
+
+    def close(self):
+        if self.content:
+            self.builder.write('>%s</%s>' % (''.join(self.content), self.name))
+        else:
+            self.builder.write(' />')
+        self.builder._open_element = None
 
     def __enter__(self):
         """Add a parent element to the document"""
-        self.builder.write_indented('<%s%s>' % (
-            self.name, self._serialized_attrs()
-        ))
+        self.builder.write('>%s' % ''.join(self.content))
         self.builder._indentation += 1
+        self.builder._open_element = None
         return self
 
     def __exit__(self, type, value, tb):
         """Add close tag to current parent element"""
         self.builder._indentation -= 1
+        if self.builder._open_element:
+            self.builder._open_element.close()
         self.builder.write_indented('</%s>' % self.name)
 
     def __call__(*args, **kargs):
         """Add a child element to the document"""
         self = args[0]
-        self.attributes.update(kargs)
-        if len(args) > 1:
-            value = args[1]
-            if value is None:
-                self.builder.write_indented('<%s%s />' % (
-                    self.name, self._serialized_attrs()
-                ))
-            else:
-                value = saxutils.escape(value)
-                self.builder.write_indented('<%s%s>%s</%s>' % (
-                    self.name, self._serialized_attrs(), value, self.name
-                ))
-        return self
-
-    def _serialized_attrs(self):
-        """Serialize attributes for element insertion"""
-        serialized = []
-        for attr, value in self.attributes.items():
-            serialized.append(' %s=%s' % (
+        for attr, value in kargs.items():
+            self.builder.write(' %s=%s' % (
                 self._nameprep(attr), saxutils.quoteattr(value)
             ))
-        return ''.join(serialized)
+        self.content.extend([saxutils.escape(s) for s in args[1:] if s])
+        return self
 
-    def _nameprep(self, name):
+    def __del__(self):
+        if self.builder._open_element is self:
+            self.close()
+
+    @classmethod
+    def _nameprep(cls, name):
         """Undo keyword and colon mangling"""
         name = Element.PYTHON_KWORD_MAP.get(name, name)
         return name.replace('__', ':')
