@@ -128,7 +128,7 @@ class XMLWitchTestCase(unittest.TestCase):
         )
 
     def test_stream_to_file(self):
-        tf = tempfile.TemporaryFile()
+        tf = tempfile.TemporaryFile('w+')
 
         xml = xmlwitch.Builder(stream=tf, version='1.0', encoding='utf-8')
         with xml.person:
