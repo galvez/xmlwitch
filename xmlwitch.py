@@ -1,14 +1,7 @@
 from __future__ import with_statement
-import sys
 from xml.sax import saxutils
 from keyword import kwlist as PYTHON_KWORD_LIST
-
-is_py2 = sys.version[0] == '2'
-
-if is_py2:
-    from StringIO import StringIO
-else:
-    from io import StringIO
+import sys
 
 __all__ = ['Builder', 'Element']
 __license__ = 'BSD'
@@ -18,7 +11,6 @@ __contributors__ = ["bbolli <http://github.com/bbolli/>",
                     "masklinn <http://github.com/masklinn/>"]
 
 class Builder:
-
     def __init__(self, encoding='utf-8', indent=' '*2, version=None, 
                  stream=None):
         self._document = stream if stream is not None else StringIO()
@@ -38,26 +30,17 @@ class Builder:
         return Element(name, self)
 
     def __str__(self):
-        if not hasattr(self._document, "getvalue"):
-            return '<streaming %s object>' % self.__class__.__name__
-        elif is_py2:
-            return self._document.getvalue().encode(self._encoding).strip()
-        else:
-            return self._document.getvalue()
+        return to_str(self.__unicode__(), self._encoding)
 
     def __unicode__(self):
-        if not hasattr(self._document, "getvalue"):
-            return '<streaming %s object>' % self.__class__.__name__
-        elif is_py2:
-            return self._document.getvalue().decode(self._encoding).strip()
+        if hasattr(self._document, "getvalue"):
+            return self._document.getvalue().rstrip()
         else:
-            return self._document.getvalue()
+            return '<streaming %s object>' % self.__class__.__name__
 
     def write(self, content):
         """Write raw content to the document"""
-        if is_py2 and type(content) is not unicode:
-            content = content.decode(self._encoding)
-        self._document.write('%s' % content)
+        self._document.write(to_unicode(content, self._encoding))
 
     def write_escaped(self, content):
         """Write escaped content to the document"""
@@ -121,3 +104,25 @@ class Element:
         """Undo keyword and colon mangling"""
         name = Element.PYTHON_KWORD_MAP.get(name, name)
         return name.replace('__', ':')
+
+#  Python 2 + 3 support
+
+if sys.version[0] == 2:
+    def to_str(u, encoding):
+        return u if isinstance(u, str) else u.encode(encoding)
+
+    def to_unicode(s, encoding):
+        return s if isinstance(s, unicode) else s.decode(encoding)
+else:  # Python 3, unicode == str
+    def to_str(u, _):
+        return u
+
+    to_unicode = to_str
+
+try:
+    from io import StringIO  # Python 3
+except ImportError:
+    try:
+        from cStringIO import StringIO  # Python 2, fast
+    except ImportError:
+        from StringIO import StringIO  # Python 2, pure

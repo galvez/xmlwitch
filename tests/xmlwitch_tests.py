@@ -2,7 +2,6 @@ from __future__ import with_statement
 
 import sys
 import os
-from xmlwitch import is_py2
 
 ROOT = os.path.abspath(
     os.path.join(
@@ -21,10 +20,7 @@ class XMLWitchTestCase(unittest.TestCase):
     def expected_document(self, filename):
         expected = os.path.join(ROOT, 'tests',  'expected',  filename)
         with open(expected) as document:
-            if is_py2:
-                return document.read()
-            else:
-                return document.read() + '\n'
+            return document.read()
 
     def test_simple_document(self):
             xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
@@ -37,18 +33,31 @@ class XMLWitchTestCase(unittest.TestCase):
             )
 
     def test_utf8_document(self):
-        if is_py2:
-            string = ("""An animated fantasy film from 1978 based on the first """
-                      """half of J.R.R Tolkien\xe2\x80\x99s Lord of the Rings novel. The """
-                      """film was mainly filmed using rotoscoping, meaning it was """
-                      """filmed in live action sequences with real actors and then """
-                      """each frame was individually animated.""")
-        else:
-            string = ("""An animated fantasy film from 1978 based on the first """
-                      """half of J.R.R Tolkien\u2019s Lord of the Rings novel. The """
-                      """film was mainly filmed using rotoscoping, meaning it was """
-                      """filmed in live action sequences with real actors and then """
-                      """each frame was individually animated.""")
+        #  Python 2 & 3 should behave identically if we give a unicode string
+        string = (u"""An animated fantasy film from 1978 based on the first """
+                  u"""half of J.R.R Tolkien\u2019s Lord of the Rings novel. The """
+                  u"""film was mainly filmed using rotoscoping, meaning it was """
+                  u"""filmed in live action sequences with real actors and then """
+                  u"""each frame was individually animated.""")
+
+        xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
+        with xml.test:
+             xml.description(string)
+
+        self.assertEquals(
+            str(xml),
+            self.expected_document('utf8_document.xml')
+        )
+
+    def test_utf8_document_ascii_encoded(self):
+        if sys.version_info[0] >= 3:
+            return  # Ascii strings not really relevant to python 3
+
+        string = ("""An animated fantasy film from 1978 based on the first """
+                  """half of J.R.R Tolkien\xe2\x80\x99s Lord of the Rings novel. The """
+                  """film was mainly filmed using rotoscoping, meaning it was """
+                  """filmed in live action sequences with real actors and then """
+                  """each frame was individually animated.""")
 
         xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
         with xml.test:
@@ -141,7 +150,7 @@ class XMLWitchTestCase(unittest.TestCase):
             self.expected_document('simple_document.xml').strip()
         )
 
-        self.assertEquals(str(xml), "<streaming Builder object>")
+        self.assertEquals(str(xml), '<streaming Builder object>')
         
 
 if __name__ == '__main__':
