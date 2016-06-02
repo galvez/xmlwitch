@@ -9,7 +9,7 @@ python:
   - 3.4
   - 3.5
   - pypy
-script: nosetests tests
+script: nosetests tests --with-coverage
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
