@@ -1,5 +1,5 @@
 from __future__ import with_statement
-from xml.sax import saxutils
+from xml.sax.saxutils import escape, quoteattr
 from keyword import kwlist as PYTHON_KWORD_LIST
 import sys
 
@@ -82,7 +82,7 @@ class Builder:
 
     def write_escaped(self, content):
         """Write escaped content to the document"""
-        self.write(saxutils.escape(self._to_str(content)))
+        self.write(escape(self._to_str(content)))
 
     def write_indented(self, content):
         """Write indented content to the document"""
@@ -103,11 +103,12 @@ class Element:
         self.builder._open_tag = self
 
     def close(self):
-        if self.content:
-            self.builder.write('>%s</%s>' % (self.content, self.name))
-        else:
-            self.builder.write(' />')
-        self.builder._open_tag = None
+        if self.builder._open_tag is self:
+            if self.content:
+                self.builder.write('>%s</%s>' % (self.content, self.name))
+            else:
+                self.builder.write(' />')
+            self.builder._open_tag = None
 
     def __enter__(self):
         """Add a parent element to the document"""
@@ -123,23 +124,22 @@ class Element:
         self.builder.write_indented('</%s>' % self.name)
 
     def __call__(*args, **kargs):
-        """Add a child element to the document"""
+        """Add content & attributes to the opened tag"""
         self = args[0]
         for attr, value in sorted(kargs.items()):
             self.builder.write(' %s=%s' % (
-                self._nameprep(attr), saxutils.quoteattr(self.builder._to_str(value))
+                self._nameprep(attr), quoteattr(self.builder._to_str(value))
             ))
         for s in args[1:]:
             if s:
-                self.content += saxutils.escape(self.builder._to_str(s))
+                self.content += escape(self.builder._to_str(s))
         return self
 
     def __del__(self):
-        if self.builder._open_tag is self:
-            self.close()
+        self.close()
 
     @classmethod
     def _nameprep(cls, name):
         """Undo keyword and colon mangling"""
-        name = Element.PYTHON_KWORD_MAP.get(name, name)
+        name = cls.PYTHON_KWORD_MAP.get(name, name)
         return name.replace('__', ':')
