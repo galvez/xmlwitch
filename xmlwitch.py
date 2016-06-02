@@ -21,7 +21,7 @@ class Builder:
 
     def __init__(self, encoding='utf-8', indent=' '*2, version=None, 
                  stream=None):
-        self._document = stream or StringIO()
+        self._document = stream if stream is not None else StringIO()
 
         self._encoding = encoding
         self._indent = indent
