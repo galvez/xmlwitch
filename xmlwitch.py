@@ -107,7 +107,7 @@ class Element:
 
 #  Python 2 + 3 support
 
-if sys.version[0] == 2:
+if sys.version_info[0] == 2:
     def to_str(u, encoding):
         return u if isinstance(u, str) else u.encode(encoding)
 
