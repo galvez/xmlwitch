@@ -11,5 +11,8 @@ python:
   - pypy
 script: nosetests tests --with-coverage
 
+install:
+  pip install coverage
+  pip install codecov
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  codecov
