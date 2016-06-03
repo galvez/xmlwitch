@@ -12,7 +12,6 @@ python:
 script: nosetests tests --with-coverage
 
 install:
-  pip install coverage
-  pip install codecov
+  pip install coverage codecov
 after_success:
   codecov
