@@ -2,8 +2,14 @@ xmlwitch
 ========
 
 [![Build Status](https://travis-ci.org/kcsaff/xmlwitch.svg?branch=master)](https://travis-ci.org/kcsaff/xmlwitch)
+[![codecov.io](https://codecov.io/gh/kcsaff/xmlwitch/coverage.svg?branch=master)](https://codecov.io/gh/kcsaff/xmlwitch?branch=master)
 
-**xmlwitch** is a BSD-licensed, Python 2.5+ library that offers idiomatic XML generation through context managers (with statement) in a minimalist implementation with less than 100 lines of code. To install, just run **pip install xmlwitch**, **easy_install xmlwitch** or copy **xmlwitch.py** to your appropriate project's directory. It's just one file.
+**xmlwitch** is a BSD-licensed, Python 2.5+ library that offers 
+idiomatic XML generation through context managers (with statement) in a
+minimalist implementation with less than 100 lines of code. To install,
+just run **pip install xmlwitch**, **easy_install xmlwitch** or copy
+**xmlwitch.py** to your appropriate project's directory. It's just one
+file.
 
     import xmlwitch
     xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
@@ -20,6 +26,10 @@ xmlwitch
             xml.summary('Some text.')
     print(xml)
 
-Please refer to [http://jonasgalvez.com.br/Software/XMLWitch.html](http://jonasgalvez.com.br/Software/XMLWitch.html) for further info.
+Please refer to 
+[http://jonasgalvez.com.br/Software/XMLWitch.html](http://jonasgalvez.com.br/Software/XMLWitch.html)
+for further info.
 
-Thanks to [maskllin](http://github.com/masklinn/) and [bbolli](http://github.com/bbolli/) for contributions. Pull requests are welcome.
+Thanks to [maskllin](http://github.com/masklinn/) and
+[bbolli](http://github.com/bbolli/) for contributions. Pull requests 
+are welcome.
