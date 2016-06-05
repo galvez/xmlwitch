@@ -12,39 +12,59 @@ sys.path.append(ROOT)
 
 import unittest
 import xmlwitch
+import tempfile
+import xml.etree.ElementTree as ET
 
 class XMLWitchTestCase(unittest.TestCase):
-    
-    def expected_document(self, filename):
+
+    def expected_document(self, filename, mode='r'):
         expected = os.path.join(ROOT, 'tests',  'expected',  filename)
-        with open(expected) as document:
+        with open(expected, mode=mode) as document:
             return document.read()
-            
+
     def test_simple_document(self):
             xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
             with xml.person:
                 xml.name("Bob")
                 xml.city("Qusqu")
             self.assertEquals(
-                str(xml), 
+                str(xml),
                 self.expected_document('simple_document.xml')
             )
-    
+
     def test_utf8_document(self):
-        string = u"""An animated fantasy film from 1978 based on the first """ \
-                 u"""half of J.R.R Tolkien\u2019s Lord of the Rings novel. The """ \
-                 u"""film was mainly filmed using rotoscoping, meaning it was """ \
-                 u"""filmed in live action sequences with real actors and then """ \
-                 u"""each frame was individually animated."""
+        #  Python 2 & 3 should behave identically if we give a unicode string
+        string = (u"""An animated fantasy film from 1978 based on the first """
+                  u"""half of J.R.R Tolkien\u2019s Lord of the Rings novel. The """
+                  u"""film was mainly filmed using rotoscoping, meaning it was """
+                  u"""filmed in live action sequences with real actors and then """
+                  u"""each frame was individually animated.""")
+
         xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
         with xml.test:
              xml.description(string)
-        
+
         self.assertEquals(
             str(xml),
             self.expected_document('utf8_document.xml')
         )
-    
+
+    def test_utf8_document_ascii_encoded(self):
+        string = (b"""An animated fantasy film from 1978 based on the first """
+                  b"""half of J.R.R Tolkien\xe2\x80\x99s Lord of the Rings novel. The """
+                  b"""film was mainly filmed using rotoscoping, meaning it was """
+                  b"""filmed in live action sequences with real actors and then """
+                  b"""each frame was individually animated.""")
+
+        xml = xmlwitch.Builder(version='1.0', encoding='utf-8')
+        with xml.test:
+             xml.description(string)
+
+        self.assertEquals(
+            str(xml),
+            self.expected_document('utf8_document.xml')
+        )
+
     def test_nested_elements(self):
         xml = xmlwitch.Builder()
         with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
@@ -59,36 +79,51 @@ class XMLWitchTestCase(unittest.TestCase):
                 xml.updated('2003-12-13T18:30:02Z')
                 xml.summary('Some text.')
         self.assertEquals(
-            str(xml), 
+            str(xml),
             self.expected_document('nested_elements.xml')
         )
-    
+
     def test_rootless_fragment(self):
         xml = xmlwitch.Builder()
         xml.data(None, value='Just some data')
         self.assertEquals(
-            str(xml), 
+            str(xml),
             self.expected_document('rootless_fragment.xml')
         )
-    
+
     def test_content_escaping(self):
         xml = xmlwitch.Builder()
         with xml.doc:
             xml.item('Text&to<escape', some_attr='attribute&value>to<escape')
         self.assertEquals(
-            str(xml), 
+            str(xml),
             self.expected_document('content_escaping.xml')
         )
-    
+
     def test_namespaces(self):
         xml = xmlwitch.Builder()
         with xml.parent(**{'xmlns:my':'http://example.org/ns/'}):
             xml.my__child(None, my__attr='foo')
         self.assertEquals(
-            str(xml), 
+            str(xml),
             self.expected_document('namespaces.xml')
-        )        
-    
+        )
+
+    def test_extended_syntax(self):
+        xml = xmlwitch.Builder(indent=' ' * 4)
+        with xml.doc:
+            xml.elem(None, x='x', y='y', z='z')  # Old syntax
+            xml.elem(x='x', y='y', z='z')  # Newly allowed syntax
+            xml.elem(z='z')(y='y')(x='x')  # Order override
+            with xml.container:  # Old syntax
+                xml.elem()  # Newly allowed syntax
+            with xml.container(None):  # Formerly buggy syntax
+                xml.elem(None)  # Old syntax
+        self.assertEquals(
+            str(xml),
+            self.expected_document('extended_syntax.xml')
+        )
+
     def test_atom_feed(self):
         xml = xmlwitch.Builder(version="1.0", encoding="utf-8")
         with xml.feed(xmlns='http://www.w3.org/2005/Atom'):
@@ -107,10 +142,28 @@ class XMLWitchTestCase(unittest.TestCase):
                     with xml.div(xmlns='http://www.w3.org/1999/xhtml'):
                         xml.label('Some label', for_='some_field')
                         xml.input(None, type='text', value='')
+        self.maxDiff = None
         self.assertEquals(
-            str(xml), 
-            self.expected_document('atom_feed.xml')
+            ET.tostring(ET.fromstring(str(xml))),
+            ET.tostring(ET.fromstring(self.expected_document('atom_feed.xml')))
         )
+
+    def test_stream_to_file(self):
+        tf = tempfile.TemporaryFile('w+b')
+
+        xml = xmlwitch.Builder(stream=tf, version='1.0', encoding='utf-8')
+        with xml.person:
+            xml.name("Bob")
+            xml.city("Qusqu")
+
+        tf.seek(0)
+        self.assertEquals(
+            tf.read(),
+            self.expected_document('simple_document.xml', 'rb')
+        )
+
+        self.assertEquals(str(xml), '<streaming Builder object>')
+        
 
 if __name__ == '__main__':
     unittest.main()

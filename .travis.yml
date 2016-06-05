@@ -1,0 +1,17 @@
+# http://travis-ci.org/#!/diyan/xmlwitch
+language: python
+python:
+#  - 2.5  # Travis no longer supports 2.5, but believed to work
+  - 2.6  # Requires nosetests
+  - 2.7
+#  - 3.2  # Test is broken due to lack of u'' syntax, but believed to work otherwise
+  - 3.3
+  - 3.4
+  - 3.5
+  - pypy
+script: nosetests tests --with-coverage
+
+install:
+  pip install coverage codecov
+after_success:
+  codecov
