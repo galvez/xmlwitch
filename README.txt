@@ -20,15 +20,10 @@ copy xmlwitch.py to your appropriate project's directory. It's just one file.
             xml.summary('Some text.')
     print(xml)
 
-Please refer to 
-
-  http://jonasgalvez.com.br/Software/XMLWitch.html 
-  
-for further info.
-
-Thanks to maskllin[1] and bbolli[2] for contributions. 
+Thanks to maskllin[1], bbolli[2] and kcsaff[3] for contributions. 
 
 Pull requests are welcome.
 
 [1] http://github.com/masklinn/
 [2] http://github.com/bbolli/
+[3] http://github.com/kcsaff/

@@ -29,23 +29,22 @@ Setup
 
     $ pip install xmlwitch # or
     $ easy_install xmlwitch # or
-    $ cd xmlwitch-0.2; python setup.py install
+    $ cd xmlwitch-0.3; python setup.py install
 
 Links
 `````
 
-* `Full documentation <http://jonasgalvez.com.br/Software/XMLWitch.html>`_
 * `Development repository <http://github.com/galvez/xmlwitch/>`_
-* `Author's website <http://jonasgalvez.com.br/>`_
+* `Author's website <http://hire.jonasgalvez.com.br/>`_
 
 """
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name = 'xmlwitch',
-    version = '0.2.1',
-    url = 'http://jonasgalvez.com.br/Software/XMLWitch.html',
+    version = '0.3',
+    url = 'http://github.com/galvez/xmlwitch/',
     license = 'BSD',
     author = "Jonas Galvez",
     author_email = "jonasgalvez@gmail.com",
